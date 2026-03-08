@@ -7,160 +7,155 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f1eb;
-    --surface: #ffffff;
-    --surface2: #faf8f4;
-    --ink: #1a1814;
-    --ink2: #4a4640;
-    --ink3: #8a857e;
-    --accent: #2d5a3d;
-    --accent2: #c8a84b;
-    --accent3: #4a7c9e;
-    --border: #ddd9d0;
-    --shadow: 0 2px 12px rgba(0,0,0,0.07);
-    --radius: 10px;
+    --bg: #f4f1eb; --surface: #ffffff; --surface2: #faf8f4;
+    --ink: #1a1814; --ink2: #4a4640; --ink3: #8a857e;
+    --accent: #2d5a3d; --accent2: #c8a84b; --accent3: #4a7c9e;
+    --border: #ddd9d0; --shadow: 0 2px 12px rgba(0,0,0,0.07); --radius: 10px;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; }
 
-  header {
-    background: var(--accent); color: #fff; padding: 0 2rem;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 60px; position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  }
-  header .logo { font-family: 'Gowun Batang', serif; font-size: 1.25rem; font-weight: 700; letter-spacing: 0.02em; }
-  header .lesson-info { font-size: 0.78rem; opacity: 0.85; text-align: right; line-height: 1.5; }
+  header { background:var(--accent); color:#fff; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+  header .logo { font-family:'Gowun Batang',serif; font-size:1.25rem; font-weight:700; letter-spacing:.02em; }
+  header .lesson-info { font-size:.78rem; opacity:.85; text-align:right; line-height:1.5; }
 
-  .progress-bar { height: 4px; background: var(--border); position: sticky; top: 60px; z-index: 99; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); width: 0%; transition: width 0.4s ease; }
+  .progress-bar { height:4px; background:var(--border); position:sticky; top:60px; z-index:99; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent2),var(--accent)); width:0%; transition:width .4s ease; }
 
-  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .container { max-width:1100px; margin:0 auto; padding:2rem 1.5rem 4rem; }
 
   /* Setup Banner */
-  .setup-banner {
-    background: #fff8e6; border: 1.5px solid var(--accent2); border-radius: var(--radius);
-    padding: 1rem 1.4rem; margin-bottom: 1.5rem;
-    display: none; align-items: flex-start; gap: 0.8rem;
-    font-size: 0.83rem; color: #6b5800; line-height: 1.7;
-  }
-  .setup-banner.show { display: flex; }
-  .setup-banner .icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
-  .setup-banner code {
-    background: #fde9a0; padding: 1px 6px; border-radius: 4px;
-    font-size: 0.78rem; font-family: 'Courier New', monospace; color: #5a4200;
-    word-break: break-all;
-  }
+  .setup-banner { background:#fff8e6; border:1.5px solid var(--accent2); border-radius:var(--radius); padding:1rem 1.4rem; margin-bottom:1.5rem; display:none; align-items:flex-start; gap:.8rem; font-size:.83rem; color:#6b5800; line-height:1.7; }
+  .setup-banner.show { display:flex; }
+  .setup-banner code { background:#fde9a0; padding:1px 6px; border-radius:4px; font-size:.78rem; font-family:'Courier New',monospace; color:#5a4200; word-break:break-all; }
 
   /* Student Info */
-  .student-info-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1rem 1.5rem; margin-bottom: 1.5rem;
-    display: flex; align-items: flex-end; gap: 1.5rem; box-shadow: var(--shadow); flex-wrap: wrap;
-  }
-  .info-field {}
-  .info-label { font-size: 0.72rem; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
-  .student-info-card input {
-    border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 0.75rem;
-    font-family: 'Noto Sans KR', sans-serif; font-size: 0.88rem; color: var(--ink);
-    background: #fdfcfa; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 130px;
-  }
-  #studentName { width: 160px !important; }
-  .student-info-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,90,61,0.1); background: #fff; }
-  .student-required-msg { font-size: 0.75rem; color: #c84b4b; display: none; }
+  .student-info-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.5rem; margin-bottom:1.5rem; display:flex; align-items:flex-end; gap:1.2rem; box-shadow:var(--shadow); flex-wrap:wrap; }
+  .info-label { font-size:.72rem; font-weight:700; color:var(--ink3); text-transform:uppercase; letter-spacing:.07em; margin-bottom:.3rem; }
+  .student-info-card input { border:1px solid var(--border); border-radius:6px; padding:.5rem .75rem; font-family:'Noto Sans KR',sans-serif; font-size:.88rem; color:var(--ink); background:#fdfcfa; outline:none; transition:border-color .2s,box-shadow .2s; }
+  .student-info-card input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(45,90,61,.1); background:#fff; }
+  #studentClass { width:110px; }
+  #studentNumber { width:72px; }
+  #studentName { width:150px; }
+  .student-required-msg { font-size:.75rem; color:#c84b4b; display:none; }
+  .required { color:#c84b4b; margin-left:2px; }
 
   /* Cards */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 2rem; overflow: hidden; box-shadow: var(--shadow); }
-  .card-header { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface2); flex-wrap: wrap; }
-  .step-badge { background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
-  .card-header h2 { font-family: 'Gowun Batang', serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); }
-  .card-desc { margin-left: auto; font-size: 0.73rem; color: var(--ink3); }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:2rem; overflow:hidden; box-shadow:var(--shadow); }
+  .card-header { display:flex; align-items:center; gap:.75rem; padding:1rem 1.5rem; border-bottom:1px solid var(--border); background:var(--surface2); flex-wrap:wrap; }
+  .step-badge { background:var(--accent); color:#fff; font-size:.7rem; font-weight:700; padding:.2rem .6rem; border-radius:20px; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; flex-shrink:0; }
+  .card-header h2 { font-family:'Gowun Batang',serif; font-size:1.1rem; font-weight:700; }
+  .card-desc { margin-left:auto; font-size:.73rem; color:var(--ink3); }
 
   /* CODAP */
-  .codap-toolbar { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; background: #2a2826; color: #ccc; font-size: 0.72rem; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-  .dot-red { background: #e05252; } .dot-yellow { background: #e0a852; } .dot-green { background: #52b452; }
-  .codap-wrap { width: 100%; height: 600px; background: #f0ede8; }
-  .codap-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
-  .codap-footer { padding: 0.65rem 1rem; background: #f5f3ee; border-top: 1px solid var(--border); font-size: 0.74rem; color: var(--ink3); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-  kbd { background: #e0ddd6; padding: 1px 5px; border-radius: 3px; font-size: 0.72rem; border: 1px solid #ccc; }
+  .codap-toolbar { display:flex; align-items:center; gap:.5rem; padding:.55rem 1rem; background:#2a2826; color:#ccc; font-size:.72rem; }
+  .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .dot-red{background:#e05252;} .dot-yellow{background:#e0a852;} .dot-green{background:#52b452;}
+  .codap-wrap { width:100%; height:600px; background:#f0ede8; }
+  .codap-wrap iframe { width:100%; height:100%; border:none; display:block; }
+  .codap-footer { padding:.65rem 1rem; background:#f5f3ee; border-top:1px solid var(--border); font-size:.74rem; color:var(--ink3); display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
+  kbd { background:#e0ddd6; padding:1px 5px; border-radius:3px; font-size:.72rem; border:1px solid #ccc; }
 
   /* Questions */
-  .questions-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
-  .question-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: box-shadow 0.2s; }
-  .question-item:hover { box-shadow: 0 2px 12px rgba(45,90,61,0.1); }
-  .question-item.answered { border-color: #a8d5b5; }
-  .question-label { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem 1.2rem; background: var(--surface2); border-bottom: 1px solid var(--border); }
-  .q-num { min-width: 26px; height: 26px; border-radius: 50%; background: var(--accent3); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-  .q-text { font-size: 0.92rem; line-height: 1.7; color: var(--ink); }
-  .q-hint { font-size: 0.78rem; color: var(--accent3); margin-top: 0.3rem; }
-  .question-answer { padding: 1rem 1.2rem; background: var(--surface); }
-  .answer-label { font-size: 0.72rem; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
-  textarea.answer-input {
-    width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem;
-    font-family: 'Noto Sans KR', sans-serif; font-size: 0.88rem; color: var(--ink);
-    background: #fdfcfa; resize: vertical; min-height: 80px; line-height: 1.6;
-    transition: border-color 0.2s, box-shadow 0.2s; outline: none;
-  }
-  textarea.answer-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,90,61,0.1); background: #fff; }
-  .char-count { text-align: right; font-size: 0.7rem; color: var(--ink3); margin-top: 0.3rem; }
+  .questions-body { padding:1.5rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .question-item { border:1px solid var(--border); border-radius:8px; overflow:hidden; transition:box-shadow .2s; }
+  .question-item:hover { box-shadow:0 2px 12px rgba(45,90,61,.1); }
+  .question-item.answered { border-color:#a8d5b5; }
+  .question-label { display:flex; align-items:flex-start; gap:.75rem; padding:1rem 1.2rem; background:var(--surface2); border-bottom:1px solid var(--border); }
+  .q-num { min-width:26px; height:26px; border-radius:50%; background:var(--accent3); color:#fff; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .q-text { font-size:.92rem; line-height:1.7; color:var(--ink); }
+  .q-hint { font-size:.78rem; color:var(--accent3); margin-top:.3rem; }
+  .question-answer { padding:1rem 1.2rem; background:var(--surface); }
+  .answer-label { font-size:.72rem; font-weight:700; color:var(--ink3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.5rem; }
+
+  textarea.answer-input { width:100%; border:1px solid var(--border); border-radius:6px; padding:.75rem; font-family:'Noto Sans KR',sans-serif; font-size:.88rem; color:var(--ink); background:#fdfcfa; resize:vertical; min-height:80px; line-height:1.6; transition:border-color .2s,box-shadow .2s; outline:none; }
+  textarea.answer-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(45,90,61,.1); background:#fff; }
+  .char-count { text-align:right; font-size:.7rem; color:var(--ink3); margin-top:.3rem; }
+
+  input.text-input { width:100%; border:1px solid var(--border); border-radius:6px; padding:.65rem .8rem; font-family:'Noto Sans KR',sans-serif; font-size:.88rem; background:#fdfcfa; color:var(--ink); transition:border-color .2s,box-shadow .2s; outline:none; }
+  input.text-input:focus { border-color:var(--accent3); box-shadow:0 0 0 3px rgba(74,124,158,.12); background:#fff; }
+
+  /* Q1 sub-fields */
+  .q1-grid { display:grid; grid-template-columns:1fr 120px 120px; gap:1rem; }
+  @media(max-width:600px){ .q1-grid { grid-template-columns:1fr; } }
+  .q1-field label { display:block; font-size:.73rem; font-weight:700; color:var(--ink3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:.35rem; }
+  input.num-input { border:1px solid var(--border); border-radius:6px; padding:.65rem .8rem; font-family:'Noto Sans KR',sans-serif; font-size:.9rem; color:var(--ink); background:#fdfcfa; outline:none; transition:border-color .2s,box-shadow .2s; width:100%; text-align:center; }
+  input.num-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(45,90,61,.1); background:#fff; }
+
+  /* Q2 attribute table */
+  .attr-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  .attr-table th { background:var(--surface2); padding:.6rem .8rem; text-align:left; font-size:.72rem; font-weight:700; color:var(--ink3); text-transform:uppercase; letter-spacing:.06em; border-bottom:2px solid var(--border); }
+  .attr-table td { padding:.55rem .8rem; border-bottom:1px solid #eeebe4; vertical-align:middle; }
+  .attr-table tr:last-child td { border-bottom:none; }
+  .attr-name { font-family:'Courier New',monospace; font-size:.82rem; background:#f0ede8; padding:2px 7px; border-radius:4px; color:#2a4a35; font-weight:700; white-space:nowrap; }
+  .attr-table input.attr-desc { border:1px solid var(--border); border-radius:5px; padding:.45rem .7rem; font-family:'Noto Sans KR',sans-serif; font-size:.84rem; width:100%; background:#fdfcfa; outline:none; transition:border-color .2s; }
+  .attr-table input.attr-desc:focus { border-color:var(--accent3); background:#fff; }
+  .attr-table select.type-select { border:1px solid var(--border); border-radius:5px; padding:.45rem .5rem; font-family:'Noto Sans KR',sans-serif; font-size:.82rem; background:#fdfcfa; color:var(--ink); outline:none; cursor:pointer; transition:border-color .2s; width:100%; }
+  .attr-table select.type-select:focus { border-color:var(--accent3); background:#fff; }
+  .type-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.72rem; font-weight:700; }
+  .type-num { background:#ddf0e8; color:#1e5c34; }
+  .type-cat { background:#dde8f5; color:#1e3d5c; }
+  .type-none { background:#f0ede8; color:#8a857e; }
 
   /* Explore */
-  .explore-body { padding: 1.5rem; }
-  .explore-intro { background: linear-gradient(135deg, #eef6f1 0%, #e8f2f8 100%); border: 1px solid #c0ddc8; border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.88rem; color: var(--ink2); line-height: 1.7; }
-  .explore-intro strong { color: var(--accent); }
-  .sub-section-title { font-size: 0.8rem; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.8rem; }
-  .explore-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
-  @media (max-width: 680px) { .explore-grid { grid-template-columns: 1fr; } }
-  .field-full { grid-column: 1 / -1; }
-  .explore-field label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--ink2); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.06em; }
-  .required { color: #c84b4b; margin-left: 2px; }
-  input.text-input { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 0.65rem 0.8rem; font-family: 'Noto Sans KR', sans-serif; font-size: 0.88rem; background: #fdfcfa; color: var(--ink); transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
-  input.text-input:focus { border-color: var(--accent3); box-shadow: 0 0 0 3px rgba(74,124,158,0.12); background: #fff; }
-  .divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
+  .explore-body { padding:1.5rem; }
+  .explore-intro { background:linear-gradient(135deg,#eef6f1 0%,#e8f2f8 100%); border:1px solid #c0ddc8; border-radius:8px; padding:1rem 1.2rem; margin-bottom:1.5rem; font-size:.88rem; color:var(--ink2); line-height:1.7; }
+  .explore-intro strong { color:var(--accent); }
+  .sub-section-title { font-size:.8rem; font-weight:700; color:var(--ink3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.8rem; }
+  .explore-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.2rem; }
+  @media(max-width:680px){ .explore-grid { grid-template-columns:1fr; } }
+  .field-full { grid-column:1/-1; }
+  .explore-field label { display:block; font-size:.75rem; font-weight:700; color:var(--ink2); margin-bottom:.4rem; text-transform:uppercase; letter-spacing:.06em; }
+  .divider { height:1px; background:var(--border); margin:1.2rem 0; }
+
+  /* Explore block */
+  .explore-block { border:1.5px solid #c0d8ea; border-radius:10px; overflow:hidden; margin-bottom:1.5rem; }
+  .explore-block-header { background:#e8f2f8; padding:.8rem 1.2rem; border-bottom:1px solid #c0d8ea; display:flex; align-items:center; gap:.6rem; }
+  .explore-block-num { background:var(--accent3); color:#fff; width:24px; height:24px; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .explore-block-title { font-size:.9rem; font-weight:700; color:var(--accent3); }
+  .explore-block-body { padding:1.2rem; background:var(--surface); }
 
   /* Upload */
-  .upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 2rem; text-align: center; background: #faf9f6; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; margin-bottom: 1rem; }
-  .upload-zone:hover, .upload-zone.drag-over { border-color: var(--accent3); background: #f0f6fa; }
-  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .upload-icon { font-size: 2.2rem; margin-bottom: 0.5rem; display: block; }
-  .upload-text { font-size: 0.83rem; color: var(--ink3); line-height: 1.6; }
-  .upload-text strong { color: var(--accent3); }
-  .preview-wrap { display: none; position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 1rem; }
-  .preview-wrap img { width: 100%; max-height: 300px; object-fit: contain; background: #f0ede8; display: block; }
-  .preview-actions { position: absolute; top: 8px; right: 8px; }
-  .btn-icon { background: rgba(0,0,0,0.55); color: #fff; border: none; border-radius: 5px; padding: 4px 10px; font-size: 0.72rem; cursor: pointer; transition: background 0.2s; font-family: 'Noto Sans KR', sans-serif; }
-  .btn-icon:hover { background: rgba(0,0,0,0.8); }
+  .upload-zone { border:2px dashed var(--border); border-radius:8px; padding:1.5rem; text-align:center; background:#faf9f6; cursor:pointer; transition:all .2s; position:relative; overflow:hidden; margin-bottom:.8rem; }
+  .upload-zone:hover, .upload-zone.drag-over { border-color:var(--accent3); background:#f0f6fa; }
+  .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .upload-icon { font-size:1.8rem; margin-bottom:.4rem; display:block; }
+  .upload-text { font-size:.8rem; color:var(--ink3); line-height:1.6; }
+  .upload-text strong { color:var(--accent3); }
+  .preview-wrap { display:none; position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--border); margin-bottom:.8rem; }
+  .preview-wrap img { width:100%; max-height:260px; object-fit:contain; background:#f0ede8; display:block; }
+  .preview-actions { position:absolute; top:8px; right:8px; }
+  .btn-icon { background:rgba(0,0,0,.55); color:#fff; border:none; border-radius:5px; padding:4px 10px; font-size:.72rem; cursor:pointer; transition:background .2s; font-family:'Noto Sans KR',sans-serif; }
+  .btn-icon:hover { background:rgba(0,0,0,.8); }
 
   /* Submit Bar */
-  .submit-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; box-shadow: var(--shadow); flex-wrap: wrap; }
-  .submit-info { font-size: 0.82rem; color: var(--ink3); line-height: 1.5; }
-  .submit-info strong { color: var(--ink); display: block; margin-bottom: 2px; }
-  .submit-right { display: flex; gap: 0.8rem; align-items: center; }
-  #submitStatus { font-size: 0.78rem; color: var(--ink3); }
-  .btn-submit { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 0.75rem 2rem; font-family: 'Noto Sans KR', sans-serif; font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem; }
-  .btn-submit:hover { background: #1e4028; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45,90,61,0.3); }
-  .btn-submit:active { transform: translateY(0); }
-  .btn-submit.loading, .btn-submit:disabled { background: #6a9a7a; cursor: not-allowed; transform: none; box-shadow: none; }
-  .spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-  .btn-submit.loading .spinner { display: block; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .submit-bar { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem 1.5rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; box-shadow:var(--shadow); flex-wrap:wrap; }
+  .submit-info { font-size:.82rem; color:var(--ink3); line-height:1.5; }
+  .submit-info strong { color:var(--ink); display:block; margin-bottom:2px; }
+  .submit-right { display:flex; gap:.8rem; align-items:center; }
+  #submitStatus { font-size:.78rem; color:var(--ink3); }
+  .btn-submit { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:.75rem 2rem; font-family:'Noto Sans KR',sans-serif; font-size:.92rem; font-weight:700; cursor:pointer; transition:all .2s; white-space:nowrap; display:flex; align-items:center; gap:.5rem; }
+  .btn-submit:hover { background:#1e4028; transform:translateY(-1px); box-shadow:0 4px 12px rgba(45,90,61,.3); }
+  .btn-submit.loading, .btn-submit:disabled { background:#6a9a7a; cursor:not-allowed; transform:none; box-shadow:none; }
+  .spinner { width:15px; height:15px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:none; }
+  .btn-submit.loading .spinner { display:block; }
+  @keyframes spin { to { transform:rotate(360deg); } }
 
   /* Toast */
-  .toast { position: fixed; bottom: 2rem; right: 2rem; background: #1a1814; color: #fff; padding: 0.85rem 1.4rem; border-radius: 8px; font-size: 0.85rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transform: translateY(100px); opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); z-index: 999; display: flex; align-items: center; gap: 0.6rem; max-width: 360px; }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.error { background: #7a2020; }
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#1a1814; color:#fff; padding:.85rem 1.4rem; border-radius:8px; font-size:.85rem; box-shadow:0 4px 20px rgba(0,0,0,.3); transform:translateY(100px); opacity:0; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:999; max-width:360px; }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.error { background:#7a2020; }
 
   /* Modal */
-  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; align-items: center; justify-content: center; }
-  .modal-bg.open { display: flex; }
-  .modal { background: var(--surface); border-radius: 14px; padding: 2.5rem; max-width: 460px; width: 90%; text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.25); animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-  @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .modal .big-emoji { font-size: 3.5rem; margin-bottom: 1rem; display: block; }
-  .modal h3 { font-family: 'Gowun Batang', serif; font-size: 1.4rem; margin-bottom: 0.5rem; }
-  .modal p { font-size: 0.88rem; color: var(--ink2); line-height: 1.7; margin-bottom: 1rem; }
-  .modal .submit-time { font-size: 0.73rem; color: var(--ink3); margin-bottom: 1.5rem; }
-  .btn-close-modal { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 0.7rem 2rem; font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; align-items:center; justify-content:center; }
+  .modal-bg.open { display:flex; }
+  .modal { background:var(--surface); border-radius:14px; padding:2.5rem; max-width:460px; width:90%; text-align:center; box-shadow:0 8px 40px rgba(0,0,0,.25); animation:popIn .4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popIn { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
+  .modal .big-emoji { font-size:3.5rem; margin-bottom:1rem; display:block; }
+  .modal h3 { font-family:'Gowun Batang',serif; font-size:1.4rem; margin-bottom:.5rem; }
+  .modal p { font-size:.88rem; color:var(--ink2); line-height:1.7; margin-bottom:1rem; }
+  .modal .submit-time { font-size:.73rem; color:var(--ink3); margin-bottom:1.5rem; }
+  .btn-close-modal { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:.7rem 2rem; font-family:'Noto Sans KR',sans-serif; font-size:.9rem; font-weight:700; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -183,29 +178,32 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC0yJXzcsJGSbj
 
   <!-- Setup Banner -->
   <div class="setup-banner" id="setupBanner">
-    <span class="icon">⚙️</span>
+    <span style="font-size:1.3rem;flex-shrink:0;">⚙️</span>
     <div>
       <strong>선생님 설정 필요</strong> — Google Apps Script URL이 아직 입력되지 않았습니다.<br>
-      함께 제공된 <code>apps-script.gs</code> 파일을 Google Apps Script에 배포한 뒤,
-      이 HTML 파일 상단 <code>APPS_SCRIPT_URL</code> 값에 웹 앱 URL을 붙여넣으세요.
-      (이 배너는 학생에게는 표시되지 않습니다)
+      <code>apps-script.gs</code>를 배포한 뒤 이 HTML 상단의 <code>APPS_SCRIPT_URL</code> 값을 교체하세요.
+      (이 배너는 URL 설정 후 사라집니다)
     </div>
   </div>
 
   <!-- 학생 정보 -->
   <div class="student-info-card">
-    <div class="info-field">
+    <div>
       <div class="info-label">반 <span class="required">*</span></div>
-      <input type="text" id="studentClass" placeholder="예) 2학년 3반" oninput="saveAll(); updateProgress();">
+      <input type="text" id="studentClass" placeholder="예) 3반" oninput="saveAll();updateProgress();">
     </div>
-    <div class="info-field">
+    <div>
+      <div class="info-label">번호 <span class="required">*</span></div>
+      <input type="number" id="studentNumber" placeholder="번호" min="1" max="50" oninput="saveAll();updateProgress();">
+    </div>
+    <div>
       <div class="info-label">이름 <span class="required">*</span></div>
-      <input type="text" id="studentName" placeholder="홍길동" oninput="saveAll(); updateProgress();">
+      <input type="text" id="studentName" placeholder="홍길동" oninput="saveAll();updateProgress();">
     </div>
-    <div id="studentRequiredMsg" class="student-required-msg">⚠️ 반과 이름을 입력해야 제출할 수 있습니다</div>
+    <div id="studentRequiredMsg" class="student-required-msg">⚠️ 반·번호·이름을 입력해야 제출할 수 있습니다</div>
   </div>
 
-  <!-- STEP 1 -->
+  <!-- ─── STEP 1 ─── -->
   <div class="card">
     <div class="card-header">
       <span class="step-badge">Step 1</span>
@@ -214,8 +212,8 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC0yJXzcsJGSbj
     </div>
     <div class="codap-toolbar">
       <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
-      <span style="margin-left:8px; color:#8a8582;">🔒</span>
-      <span style="color:#9a9690; font-size:0.7rem;">codap.concord.org — U.S. Crime Rates Dataset</span>
+      <span style="margin-left:8px;color:#8a8582;">🔒</span>
+      <span style="color:#9a9690;font-size:.7rem;">codap.concord.org — U.S. Crime Rates Dataset</span>
     </div>
     <div class="codap-wrap">
       <iframe
@@ -227,14 +225,14 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC0yJXzcsJGSbj
       ></iframe>
     </div>
     <div class="codap-footer">
-      💡&nbsp;그래프 캡처 방법:&nbsp;
+      💡&nbsp;그래프 캡처:&nbsp;
       <kbd>Windows</kbd>&nbsp;Win+Shift+S &nbsp;|&nbsp;
       <kbd>Mac</kbd>&nbsp;Cmd+Shift+4 &nbsp;|&nbsp;
-      CODAP 내 카메라 아이콘(📷) 버튼 사용 가능
+      CODAP 내 카메라(📷) 버튼 사용 가능
     </div>
   </div>
 
-  <!-- STEP 2 -->
+  <!-- ─── STEP 2 ─── -->
   <div class="card">
     <div class="card-header">
       <span class="step-badge">Step 2</span>
@@ -243,150 +241,240 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC0yJXzcsJGSbj
     </div>
     <div class="questions-body">
 
-      <div class="question-item">
+      <!-- Q1 -->
+      <div class="question-item" id="qi1">
         <div class="question-label">
           <div class="q-num">1</div>
           <div>
-            <div class="q-text">이 데이터셋은 무엇에 관한 데이터인가요? 각 행(케이스)은 무엇을 나타내며, 총 몇 개의 사례가 있나요?</div>
-            <div class="q-hint">💡 케이스 테이블 상단에서 총 케이스 수를 확인하고, 하나의 행이 의미하는 바를 생각해보세요</div>
+            <div class="q-text">이 데이터셋은 무엇에 대한 데이터인가요? 총 몇 개의 속성과 몇 개의 행이 있나요?</div>
+            <div class="q-hint">💡 CODAP 케이스 테이블 상단에서 행(케이스) 수를, 열 개수로 속성 수를 확인해보세요</div>
           </div>
         </div>
         <div class="question-answer">
           <div class="answer-label">내 답변</div>
-          <textarea class="answer-input" id="q1" placeholder="예) 이 데이터는 미국의 연도별 범죄율에 관한 데이터이며, 각 행은 특정 연도를 나타냅니다. 총 ___개의 사례가 있습니다." rows="2" data-max="300" oninput="updateCharCount(this); saveAll(); updateProgress();"></textarea>
-          <div class="char-count"><span class="current">0</span> / 300자</div>
+          <div class="q1-grid">
+            <div class="q1-field">
+              <label>이 데이터는 무엇에 관한 데이터인가요?</label>
+              <input type="text" class="text-input" id="q1_topic" placeholder="무엇에 관한 데이터인지 작성하세요" oninput="saveAll();checkQ1Answered();">
+            </div>
+            <div class="q1-field">
+              <label>속성(열) 수</label>
+              <input type="number" class="num-input" id="q1_attrs" placeholder="개" min="1" oninput="saveAll();checkQ1Answered();">
+            </div>
+            <div class="q1-field">
+              <label>행(케이스) 수</label>
+              <input type="number" class="num-input" id="q1_rows" placeholder="개" min="1" oninput="saveAll();checkQ1Answered();">
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="question-item">
+      <!-- Q2 -->
+      <div class="question-item" id="qi2">
         <div class="question-label">
           <div class="q-num">2</div>
           <div>
-            <div class="q-text">데이터에 포함된 변수(속성)를 모두 나열하고, 각각이 수치형인지 범주형인지 분류하세요. 그 중 어떤 변수가 '범죄'와 직접 관련이 있나요?</div>
-            <div class="q-hint">💡 속성 이름 위에 마우스를 올리면 유형을 확인할 수 있어요</div>
+            <div class="q-text">데이터에 포함된 각 속성이 무엇을 나타내는지 설명하고, 수치형인지 범주형인지 구분해보세요.</div>
+            <div class="q-hint">💡 속성명을 클릭하거나 마우스를 올리면 유형 정보를 확인할 수 있어요</div>
           </div>
         </div>
-        <div class="question-answer">
-          <div class="answer-label">내 답변</div>
-          <textarea class="answer-input" id="q2" placeholder="예) Year(수치형), Murder(수치형), Robbery(수치형), Population(수치형)..." rows="3" data-max="500" oninput="updateCharCount(this); saveAll(); updateProgress();"></textarea>
-          <div class="char-count"><span class="current">0</span> / 500자</div>
+        <div class="question-answer" style="padding:.8rem;">
+          <table class="attr-table">
+            <thead>
+              <tr>
+                <th style="width:180px;">속성명</th>
+                <th>이 속성이 나타내는 것</th>
+                <th style="width:130px;">데이터 유형</th>
+              </tr>
+            </thead>
+            <tbody id="attrTableBody">
+              <!-- JS로 생성 -->
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div class="question-item">
+      <!-- Q3 -->
+      <div class="question-item" id="qi3">
         <div class="question-label">
           <div class="q-num">3</div>
           <div>
-            <div class="q-text">CODAP에서 그래프를 하나 만들어 보세요. 어떤 변수를 x축과 y축에 배치했나요? 그 이유와 그래프 유형도 함께 적어주세요.</div>
-            <div class="q-hint">💡 "왜 이 두 변수를 비교하고 싶었는지" 이유를 구체적으로 써보세요</div>
+            <div class="q-text">아래 질문들 중 <strong>하나를 선택</strong>하고, CODAP에서 그래프를 만들어 답을 구해보세요.<br>
+              <span style="font-size:.82rem;color:var(--ink3);">① 조사 기간 중 살인(Murder) 범죄 건수가 가장 많았던 해는 언제인가요?<br>
+              ② 전체 기간에서 강도(Robbery) 범죄 건수가 가장 적었던 해는 언제인가요?<br>
+              ③ 폭력 범죄(Violent Crime) 건수가 감소하기 시작한 시점은 언제인가요?</span>
+            </div>
+            <div class="q-hint">💡 하나의 속성만 사용해도 이 질문들에 답할 수 있어요. 막대그래프나 꺾은선 그래프를 활용해보세요</div>
           </div>
         </div>
         <div class="question-answer">
-          <div class="answer-label">내 답변</div>
-          <textarea class="answer-input" id="q3" placeholder="x축: _____ / y축: _____&#10;그래프 유형: 산점도 / 꺾은선 그래프 / ...&#10;선택 이유: ..." rows="4" data-max="500" oninput="updateCharCount(this); saveAll(); updateProgress();"></textarea>
-          <div class="char-count"><span class="current">0</span> / 500자</div>
+          <div class="answer-label">선택한 질문 번호 및 답변</div>
+          <textarea class="answer-input" id="q3" placeholder="선택 질문: ①/②/③&#10;답: ___년&#10;그래프에서 읽은 방법: ..." rows="3" data-max="400" oninput="updateCharCount(this);saveAll();updateProgress();"></textarea>
+          <div class="char-count"><span class="current">0</span> / 400자</div>
         </div>
       </div>
 
-      <div class="question-item">
+      <!-- Q4 -->
+      <div class="question-item" id="qi4">
         <div class="question-label">
           <div class="q-num">4</div>
           <div>
-            <div class="q-text">그래프에서 발견한 패턴이나 경향을 설명하세요. 시간이 지남에 따라 범죄율이 어떻게 변화했나요? 특이한 시기가 있다면 그 이유를 추측해보세요.</div>
-            <div class="q-hint">💡 "~년대에는 ~가 증가했는데, 이는 ~때문일 것이다"처럼 근거를 포함해 서술하세요</div>
+            <div class="q-text">범죄 건수가 많다고 해서 무조건 위험한 해일까요? 인구(Population) 대비 특정 범죄 건수를 계산해 <strong>인구 10만 명당 범죄율</strong>을 구하고, 연도별 변화를 그래프로 나타내보세요.</div>
+            <div class="q-hint">💡 CODAP에서 새 속성을 추가하고 수식으로 <em>(범죄건수 / Population) × 100000</em> 을 입력하면 범죄율을 계산할 수 있어요</div>
           </div>
         </div>
         <div class="question-answer">
-          <div class="answer-label">내 답변</div>
-          <textarea class="answer-input" id="q4" placeholder="발견한 패턴: ...&#10;특이한 시기: ...&#10;추측 이유: ..." rows="4" data-max="600" oninput="updateCharCount(this); saveAll(); updateProgress();"></textarea>
-          <div class="char-count"><span class="current">0</span> / 600자</div>
+          <div style="margin-bottom:.8rem;">
+            <div class="answer-label">① 선택한 범죄 유형 및 계산 방법</div>
+            <textarea class="answer-input" id="q4_calc" placeholder="선택한 범죄: ___&#10;계산식: (_____ / Population) × 100000&#10;계산 결과 해석: 인구 10만 명당 약 ___ 건" rows="2" data-max="300" oninput="updateCharCount(this);saveAll();updateProgress();"></textarea>
+            <div class="char-count"><span class="current">0</span> / 300자</div>
+          </div>
+          <div style="margin-bottom:.8rem;">
+            <div class="answer-label">② 그래프 캡처 업로드</div>
+            <div class="upload-zone" id="uploadZoneQ4">
+              <input type="file" id="graphUploadQ4" accept="image/*" onchange="handleImageUpload(event,'q4')">
+              <span class="upload-icon">📸</span>
+              <div class="upload-text"><strong>인구 대비 범죄율 그래프 이미지 업로드</strong><br>PNG, JPG (최대 5MB)</div>
+            </div>
+            <div class="preview-wrap" id="previewWrapQ4">
+              <img id="previewImgQ4" src="" alt="Q4 그래프">
+              <div class="preview-actions"><button class="btn-icon" onclick="removeImage('q4')">✕ 삭제</button></div>
+            </div>
+          </div>
+          <div>
+            <div class="answer-label">③ 발견한 내용</div>
+            <textarea class="answer-input" id="q4_desc" placeholder="단순 건수와 인구 대비 범죄율을 비교했을 때 어떤 차이가 있었나요? 인구 대비 범죄율이 특히 높거나 낮은 해가 있었나요?" rows="3" data-max="500" oninput="updateCharCount(this);saveAll();updateProgress();"></textarea>
+            <div class="char-count"><span class="current">0</span> / 500자</div>
+          </div>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- STEP 3 -->
+  <!-- ─── STEP 3 ─── -->
   <div class="card">
     <div class="card-header">
       <span class="step-badge" style="background:var(--accent2);">Step 3</span>
       <h2>나만의 탐구 질문 만들기</h2>
-      <span class="card-desc" style="color:var(--accent2); font-weight:600;">자유 탐구</span>
+      <span class="card-desc" style="color:var(--accent2);font-weight:600;">자유 탐구 × 3</span>
     </div>
     <div class="explore-body">
 
       <div class="explore-intro">
         <strong>🔍 자유 탐구란?</strong><br>
-        데이터에서 <strong>스스로 탐구 질문</strong>을 만들고, CODAP으로 그 질문에 답하는 그래프를 직접 만들어 보세요.
-        완성된 그래프를 캡처해서 업로드하고, 발견한 내용을 설명해주세요.
+        데이터에서 <strong>스스로 탐구 질문을 3개</strong> 만들고, CODAP으로 각 질문에 답하는 그래프를 만들어 보세요.
+        그래프를 캡처해서 업로드하고, 발견한 내용을 설명해주세요.
       </div>
 
-      <div class="sub-section-title">① 탐구 질문 설계</div>
-      <div class="explore-grid">
-        <div class="explore-field">
-          <label>탐구 질문 <span class="required">*</span></label>
-          <input type="text" class="text-input" id="exploreQ" placeholder="예) 살인율과 강도율 사이에 관련이 있을까?" oninput="saveAll(); updateProgress();">
+      <!-- Explore 1 -->
+      <div class="explore-block">
+        <div class="explore-block-header">
+          <div class="explore-block-num">1</div>
+          <div class="explore-block-title">첫 번째 탐구</div>
         </div>
-        <div class="explore-field">
-          <label>사용한 변수 (x → y)</label>
-          <input type="text" class="text-input" id="exploreVars" placeholder="예) Year → Murder Rate" oninput="saveAll();">
-        </div>
-        <div class="explore-field field-full">
-          <label>이 질문을 선택한 이유</label>
-          <input type="text" class="text-input" id="exploreReason" placeholder="왜 이 두 변수 사이의 관계가 궁금했나요?" oninput="saveAll();">
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="sub-section-title" style="margin-top:1rem;">② 탐구 그래프 캡처 업로드 <span class="required">*</span></div>
-      <div style="font-size:0.75rem; color:var(--ink3); margin-bottom:0.8rem;">제출 시 선생님의 Google Drive 폴더에 자동으로 저장됩니다</div>
-
-      <div class="upload-zone" id="uploadZone">
-        <input type="file" id="graphUpload" accept="image/*" onchange="handleImageUpload(event)">
-        <span class="upload-icon">📸</span>
-        <div class="upload-text">
-          <strong>클릭하거나 이미지를 드래그해서 업로드</strong><br>
-          CODAP에서 캡처한 그래프 이미지 (PNG, JPG, GIF / 최대 5MB)
-        </div>
-      </div>
-      <div class="preview-wrap" id="previewWrap">
-        <img id="previewImg" src="" alt="업로드된 그래프">
-        <div class="preview-actions">
-          <button class="btn-icon" onclick="removeImage()">✕ 삭제</button>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="sub-section-title" style="margin-top:1rem;">③ 그래프 해설 작성</div>
-
-      <div class="question-item" style="border-color:#c0d8ea;">
-        <div class="question-label" style="background:#f0f6fa; border-bottom-color:#c0d8ea;">
-          <div class="q-num" style="background:var(--accent3);">✍</div>
-          <div>
-            <div class="q-text">그래프에서 무엇을 발견했나요? 탐구 질문에 대한 답을 데이터 근거(구체적 수치, 기간, 변화 방향)와 함께 서술하세요.</div>
-            <div class="q-hint">💡 "~년에 ~가 ~% 증가했다" 처럼 구체적인 수치를 포함하면 더 좋습니다</div>
+        <div class="explore-block-body">
+          <div class="explore-grid" style="margin-bottom:.8rem;">
+            <div class="explore-field">
+              <label>탐구 질문 <span class="required">*</span></label>
+              <input type="text" class="text-input" id="e1_q" placeholder="예) 살인율과 강도율 사이에 관련이 있을까?" oninput="saveAll();updateProgress();">
+            </div>
+            <div class="explore-field">
+              <label>사용한 변수 (x → y)</label>
+              <input type="text" class="text-input" id="e1_vars" placeholder="예) Year → Murder" oninput="saveAll();">
+            </div>
+            <div class="explore-field field-full">
+              <label>이 질문을 선택한 이유</label>
+              <input type="text" class="text-input" id="e1_reason" placeholder="왜 이 변수들 사이의 관계가 궁금했나요?" oninput="saveAll();">
+            </div>
           </div>
-        </div>
-        <div class="question-answer">
-          <div class="answer-label">해설 작성</div>
-          <textarea class="answer-input" id="exploreDesc" placeholder="예) 그래프를 보면 1980년대에 살인율이 최고조에 달했다가 이후 꾸준히 감소하는 경향이 보입니다. 특히 1991년 살인율은 9.8로 가장 높았으며..." rows="5" data-max="800" oninput="updateCharCount(this); saveAll(); updateProgress();"></textarea>
-          <div class="char-count"><span class="current">0</span> / 800자</div>
+          <div class="sub-section-title" style="margin-top:.5rem;">그래프 캡처 업로드</div>
+          <div class="upload-zone" id="uploadZone1">
+            <input type="file" id="graphUpload1" accept="image/*" onchange="handleImageUpload(event,'e1')">
+            <span class="upload-icon">📸</span>
+            <div class="upload-text"><strong>클릭 또는 드래그</strong><br>CODAP 그래프 이미지 (PNG, JPG / 최대 5MB)</div>
+          </div>
+          <div class="preview-wrap" id="previewWrap1">
+            <img id="previewImg1" src="" alt="탐구1 그래프">
+            <div class="preview-actions"><button class="btn-icon" onclick="removeImage('e1')">✕ 삭제</button></div>
+          </div>
+          <div class="sub-section-title" style="margin-top:.3rem;">해설 작성</div>
+          <textarea class="answer-input" id="e1_desc" placeholder="그래프에서 발견한 패턴, 경향, 수치를 근거로 설명해주세요." rows="4" data-max="600" oninput="updateCharCount(this);saveAll();updateProgress();"></textarea>
+          <div class="char-count"><span class="current">0</span> / 600자</div>
         </div>
       </div>
 
-      <div class="question-item" style="margin-top:1rem; border-color:#d5c8e8;">
-        <div class="question-label" style="background:#f8f4fd; border-bottom-color:#d5c8e8;">
-          <div class="q-num" style="background:#7c5cbf;">💬</div>
-          <div>
-            <div class="q-text">이 탐구를 통해 새롭게 알게 된 점, 또는 더 깊이 탐구하고 싶은 새 질문이 있다면 적어보세요.</div>
-          </div>
+      <!-- Explore 2 -->
+      <div class="explore-block" style="border-color:#d0c8e8;">
+        <div class="explore-block-header" style="background:#f4f0fc;border-bottom-color:#d0c8e8;">
+          <div class="explore-block-num" style="background:#7c5cbf;">2</div>
+          <div class="explore-block-title" style="color:#7c5cbf;">두 번째 탐구</div>
         </div>
-        <div class="question-answer">
-          <div class="answer-label">반성 및 확장 질문</div>
-          <textarea class="answer-input" id="exploreReflect" placeholder="새롭게 알게 된 점: ...&#10;더 알고 싶은 것: ..." rows="3" data-max="500" oninput="updateCharCount(this); saveAll(); updateProgress();"></textarea>
-          <div class="char-count"><span class="current">0</span> / 500자</div>
+        <div class="explore-block-body">
+          <div class="explore-grid" style="margin-bottom:.8rem;">
+            <div class="explore-field">
+              <label>탐구 질문 <span class="required">*</span></label>
+              <input type="text" class="text-input" id="e2_q" placeholder="예) 재산 범죄와 폭력 범죄는 같은 방향으로 변할까?" oninput="saveAll();updateProgress();">
+            </div>
+            <div class="explore-field">
+              <label>사용한 변수 (x → y)</label>
+              <input type="text" class="text-input" id="e2_vars" placeholder="예) Property_Crime → Violent_Crime" oninput="saveAll();">
+            </div>
+            <div class="explore-field field-full">
+              <label>이 질문을 선택한 이유</label>
+              <input type="text" class="text-input" id="e2_reason" placeholder="왜 이 변수들 사이의 관계가 궁금했나요?" oninput="saveAll();">
+            </div>
+          </div>
+          <div class="sub-section-title" style="margin-top:.5rem;">그래프 캡처 업로드</div>
+          <div class="upload-zone" id="uploadZone2">
+            <input type="file" id="graphUpload2" accept="image/*" onchange="handleImageUpload(event,'e2')">
+            <span class="upload-icon">📸</span>
+            <div class="upload-text"><strong>클릭 또는 드래그</strong><br>CODAP 그래프 이미지 (PNG, JPG / 최대 5MB)</div>
+          </div>
+          <div class="preview-wrap" id="previewWrap2">
+            <img id="previewImg2" src="" alt="탐구2 그래프">
+            <div class="preview-actions"><button class="btn-icon" onclick="removeImage('e2')">✕ 삭제</button></div>
+          </div>
+          <div class="sub-section-title" style="margin-top:.3rem;">해설 작성</div>
+          <textarea class="answer-input" id="e2_desc" placeholder="그래프에서 발견한 패턴, 경향, 수치를 근거로 설명해주세요." rows="4" data-max="600" oninput="updateCharCount(this);saveAll();updateProgress();"></textarea>
+          <div class="char-count"><span class="current">0</span> / 600자</div>
+        </div>
+      </div>
+
+      <!-- Explore 3 -->
+      <div class="explore-block" style="border-color:#d4e0c8;">
+        <div class="explore-block-header" style="background:#f0f6ea;border-bottom-color:#d4e0c8;">
+          <div class="explore-block-num" style="background:#4a7a34;">3</div>
+          <div class="explore-block-title" style="color:#4a7a34;">세 번째 탐구</div>
+        </div>
+        <div class="explore-block-body">
+          <div class="explore-grid" style="margin-bottom:.8rem;">
+            <div class="explore-field">
+              <label>탐구 질문 <span class="required">*</span></label>
+              <input type="text" class="text-input" id="e3_q" placeholder="예) 자동차 절도와 주거침입 범죄는 관련이 있을까?" oninput="saveAll();updateProgress();">
+            </div>
+            <div class="explore-field">
+              <label>사용한 변수 (x → y)</label>
+              <input type="text" class="text-input" id="e3_vars" placeholder="예) Burglary → Motor_Vehicle_Theft" oninput="saveAll();">
+            </div>
+            <div class="explore-field field-full">
+              <label>이 질문을 선택한 이유</label>
+              <input type="text" class="text-input" id="e3_reason" placeholder="왜 이 변수들 사이의 관계가 궁금했나요?" oninput="saveAll();">
+            </div>
+          </div>
+          <div class="sub-section-title" style="margin-top:.5rem;">그래프 캡처 업로드</div>
+          <div class="upload-zone" id="uploadZone3">
+            <input type="file" id="graphUpload3" accept="image/*" onchange="handleImageUpload(event,'e3')">
+            <span class="upload-icon">📸</span>
+            <div class="upload-text"><strong>클릭 또는 드래그</strong><br>CODAP 그래프 이미지 (PNG, JPG / 최대 5MB)</div>
+          </div>
+          <div class="preview-wrap" id="previewWrap3">
+            <img id="previewImg3" src="" alt="탐구3 그래프">
+            <div class="preview-actions"><button class="btn-icon" onclick="removeImage('e3')">✕ 삭제</button></div>
+          </div>
+          <div class="sub-section-title" style="margin-top:.3rem;">해설 작성</div>
+          <textarea class="answer-input" id="e3_desc" placeholder="그래프에서 발견한 패턴, 경향, 수치를 근거로 설명해주세요." rows="4" data-max="600" oninput="updateCharCount(this);saveAll();updateProgress();"></textarea>
+          <div class="char-count"><span class="current">0</span> / 600자</div>
         </div>
       </div>
 
@@ -397,7 +485,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC0yJXzcsJGSbj
   <div class="submit-bar">
     <div class="submit-info">
       <strong>제출 전 확인사항</strong>
-      반·이름, 탐구 질문, 그래프 이미지 업로드를 완료했는지 확인하세요.<br>
+      반·번호·이름, 탐구 질문 3개, 그래프 이미지를 모두 완료했는지 확인하세요.<br>
       제출 시 선생님의 <strong>Google 스프레드시트</strong>에 자동 기록됩니다.
     </div>
     <div class="submit-right">
@@ -411,10 +499,8 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC0yJXzcsJGSbj
 
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"><span id="toastMsg"></span></div>
 
-<!-- Modal -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <span class="big-emoji">🎉</span>
@@ -426,32 +512,75 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC0yJXzcsJGSbj
 </div>
 
 <script>
-const SAVE_KEY = 'data-crime-v1';
-const FIELD_IDS = ['studentClass','studentName','q1','q2','q3','q4','exploreQ','exploreVars','exploreReason','exploreDesc','exploreReflect'];
-let imageBase64 = null;
+// ── 속성 정의 ──
+const ATTRIBUTES = [
+  { name: 'Year',                          id: 'attr_year' },
+  { name: 'Population',                    id: 'attr_pop' },
+  { name: 'Violent_Crime',                 id: 'attr_vc' },
+  { name: 'Murder_and_Nonneg_Manslaughter',id: 'attr_murder' },
+  { name: 'Legacy_Rape',                   id: 'attr_rape' },
+  { name: 'Robbery',                       id: 'attr_rob' },
+  { name: 'Aggravated_Assault',            id: 'attr_assault' },
+  { name: 'Property_Crime',                id: 'attr_pc' },
+  { name: 'Burglary',                      id: 'attr_burg' },
+  { name: 'Larceny_Theft',                 id: 'attr_larceny' },
+  { name: 'Motor_Vehicle_Theft',           id: 'attr_mvt' },
+];
 
-// ── Init ──
-window.addEventListener('DOMContentLoaded', () => {
-  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
-    document.getElementById('setupBanner').classList.add('show');
-  }
-  loadAll();
-  updateProgress();
-  document.querySelectorAll('textarea.answer-input').forEach(el => updateCharCount(el));
-});
+// 속성 테이블 동적 생성
+(function buildAttrTable() {
+  const tbody = document.getElementById('attrTableBody');
+  ATTRIBUTES.forEach(attr => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="attr-name">${attr.name}</span></td>
+      <td><input type="text" class="attr-desc" id="${attr.id}_desc" placeholder="이 속성이 나타내는 것을 설명하세요" oninput="saveAll();checkQ2Answered();"></td>
+      <td>
+        <select class="type-select" id="${attr.id}_type" onchange="saveAll();checkQ2Answered();">
+          <option value="">선택하세요</option>
+          <option value="수치형">수치형 (Numerical)</option>
+          <option value="범주형">범주형 (Categorical)</option>
+        </select>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+})();
 
-// ── Auto Save ──
+// ── 자동 저장 ──
+const SAVE_KEY = 'data-crime-v2';
+const TEXT_FIELDS = [
+  'studentClass','studentNumber','studentName',
+  'q1_topic','q1_attrs','q1_rows',
+  'q3','q4_calc','q4_desc',
+  'e1_q','e1_vars','e1_reason','e1_desc',
+  'e2_q','e2_vars','e2_reason','e2_desc',
+  'e3_q','e3_vars','e3_reason','e3_desc',
+];
+
 function saveAll() {
   const data = {};
-  FIELD_IDS.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
+  TEXT_FIELDS.forEach(id => { const el = document.getElementById(id); if(el) data[id] = el.value; });
+  ATTRIBUTES.forEach(a => {
+    const d = document.getElementById(a.id+'_desc');
+    const t = document.getElementById(a.id+'_type');
+    if(d) data[a.id+'_desc'] = d.value;
+    if(t) data[a.id+'_type'] = t.value;
+  });
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(e) {}
 }
+
 function loadAll() {
   try {
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
-    Object.keys(saved).forEach(id => {
+    TEXT_FIELDS.forEach(id => {
       const el = document.getElementById(id);
-      if (el) { el.value = saved[id]; if (el.tagName === 'TEXTAREA') updateCharCount(el); }
+      if(el && saved[id] !== undefined) { el.value = saved[id]; if(el.tagName==='TEXTAREA') updateCharCount(el); }
+    });
+    ATTRIBUTES.forEach(a => {
+      const d = document.getElementById(a.id+'_desc');
+      const t = document.getElementById(a.id+'_type');
+      if(d && saved[a.id+'_desc']) d.value = saved[a.id+'_desc'];
+      if(t && saved[a.id+'_type']) t.value = saved[a.id+'_type'];
     });
   } catch(e) {}
 }
@@ -459,51 +588,106 @@ function loadAll() {
 // ── Char Count ──
 function updateCharCount(el) {
   const max = parseInt(el.dataset.max) || 500;
-  const wrap = el.closest('.question-answer');
+  const wrap = el.closest('.question-answer, .explore-block-body');
   const cur = wrap ? wrap.querySelector('.current') : null;
-  if (cur) cur.textContent = el.value.length;
+  if(cur) cur.textContent = el.value.length;
   el.style.borderColor = el.value.length > max * 0.9 ? 'var(--accent2)' : '';
   const item = el.closest('.question-item');
-  if (item) item.classList.toggle('answered', el.value.trim().length > 0);
+  if(item) item.classList.toggle('answered', el.value.trim().length > 0);
+}
+
+// ── Q1 완성 체크 ──
+function checkQ1Answered() {
+  const ok = document.getElementById('q1_topic').value.trim() &&
+             document.getElementById('q1_attrs').value.trim() &&
+             document.getElementById('q1_rows').value.trim();
+  document.getElementById('qi1').classList.toggle('answered', !!ok);
+  updateProgress();
+}
+
+// ── Q2 완성 체크 ──
+function checkQ2Answered() {
+  const allFilled = ATTRIBUTES.every(a => {
+    const d = document.getElementById(a.id+'_desc');
+    const t = document.getElementById(a.id+'_type');
+    return d && d.value.trim() && t && t.value;
+  });
+  document.getElementById('qi2').classList.toggle('answered', allFilled);
+  updateProgress();
 }
 
 // ── Progress ──
 function updateProgress() {
-  const required = ['q1','q2','q3','q4','exploreQ','exploreDesc','studentClass','studentName'];
-  const filled = required.filter(id => { const el = document.getElementById(id); return el && el.value.trim(); }).length;
-  const hasImg = document.getElementById('previewWrap').style.display !== 'none';
-  const pct = Math.round(((filled + (hasImg ? 1 : 0)) / (required.length + 1)) * 100);
+  const checks = [
+    document.getElementById('studentClass')?.value.trim(),
+    document.getElementById('studentNumber')?.value.trim(),
+    document.getElementById('studentName')?.value.trim(),
+    document.getElementById('q1_topic')?.value.trim(),
+    document.getElementById('q3')?.value.trim(),
+    document.getElementById('q4_calc')?.value.trim(),
+    document.getElementById('q4_desc')?.value.trim(),
+    document.getElementById('e1_q')?.value.trim(),
+    document.getElementById('e1_desc')?.value.trim(),
+    document.getElementById('e2_q')?.value.trim(),
+    document.getElementById('e2_desc')?.value.trim(),
+    document.getElementById('e3_q')?.value.trim(),
+    document.getElementById('e3_desc')?.value.trim(),
+  ];
+  const imgCount = ['q4','e1','e2','e3'].filter(k => imageStore[k]).length;
+  const filled = checks.filter(Boolean).length + imgCount;
+  const total = checks.length + 4;
+  const pct = Math.round((filled / total) * 100);
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('submitStatus').textContent = `완성도 ${pct}%`;
 }
 
-// ── Image Upload ──
-const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) processImage(f); });
+// ── Image Upload (다중) ──
+const imageStore = { q4: null, e1: null, e2: null, e3: null };
+const uploadConfig = {
+  q4:  { zone:'uploadZoneQ4',  wrap:'previewWrapQ4',  img:'previewImgQ4' },
+  e1:  { zone:'uploadZone1',   wrap:'previewWrap1',   img:'previewImg1'  },
+  e2:  { zone:'uploadZone2',   wrap:'previewWrap2',   img:'previewImg2'  },
+  e3:  { zone:'uploadZone3',   wrap:'previewWrap3',   img:'previewImg3'  },
+};
 
-function handleImageUpload(e) { const f = e.target.files[0]; if (f) processImage(f); }
+// Drag & Drop 등록
+Object.keys(uploadConfig).forEach(key => {
+  const zoneEl = document.getElementById(uploadConfig[key].zone);
+  if(!zoneEl) return;
+  zoneEl.addEventListener('dragover', e => { e.preventDefault(); zoneEl.classList.add('drag-over'); });
+  zoneEl.addEventListener('dragleave', () => zoneEl.classList.remove('drag-over'));
+  zoneEl.addEventListener('drop', e => {
+    e.preventDefault(); zoneEl.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if(f && f.type.startsWith('image/')) processImage(f, key);
+  });
+});
 
-function processImage(file) {
-  if (file.size > 5 * 1024 * 1024) { showToast('⚠️ 이미지 크기가 5MB를 초과합니다', true); return; }
+function handleImageUpload(e, key) { const f = e.target.files[0]; if(f) processImage(f, key); }
+
+function processImage(file, key) {
+  if(file.size > 5*1024*1024) { showToast('⚠️ 이미지 크기가 5MB를 초과합니다', true); return; }
   const reader = new FileReader();
-  reader.onload = e => {
-    imageBase64 = e.target.result;
-    document.getElementById('previewImg').src = imageBase64;
-    document.getElementById('uploadZone').style.display = 'none';
-    document.getElementById('previewWrap').style.display = 'block';
+  reader.onload = ev => {
+    imageStore[key] = ev.target.result;
+    const cfg = uploadConfig[key];
+    document.getElementById(cfg.img).src = imageStore[key];
+    document.getElementById(cfg.zone).style.display = 'none';
+    document.getElementById(cfg.wrap).style.display = 'block';
     showToast('📸 그래프 이미지가 업로드되었습니다');
     updateProgress();
   };
   reader.readAsDataURL(file);
 }
-function removeImage() {
-  imageBase64 = null;
-  document.getElementById('graphUpload').value = '';
-  document.getElementById('previewImg').src = '';
-  document.getElementById('uploadZone').style.display = 'block';
-  document.getElementById('previewWrap').style.display = 'none';
+
+function removeImage(key) {
+  imageStore[key] = null;
+  const cfg = uploadConfig[key];
+  const inputId = { q4:'graphUploadQ4', e1:'graphUpload1', e2:'graphUpload2', e3:'graphUpload3' };
+  document.getElementById(inputId[key]).value = '';
+  document.getElementById(cfg.img).src = '';
+  document.getElementById(cfg.zone).style.display = 'block';
+  document.getElementById(cfg.wrap).style.display = 'none';
   updateProgress();
 }
 
@@ -522,64 +706,81 @@ function showToast(msg, isError = false) {
 // ── Submit ──
 async function handleSubmit() {
   const cls  = document.getElementById('studentClass').value.trim();
+  const num  = document.getElementById('studentNumber').value.trim();
   const name = document.getElementById('studentName').value.trim();
-  if (!cls || !name) {
+  if(!cls || !num || !name) {
     document.getElementById('studentRequiredMsg').style.display = 'block';
-    showToast('⚠️ 반과 이름을 먼저 입력해주세요', true);
-    document.getElementById('studentClass').focus();
+    showToast('⚠️ 반·번호·이름을 먼저 입력해주세요', true);
     return;
   }
   document.getElementById('studentRequiredMsg').style.display = 'none';
-  if (!document.getElementById('exploreQ').value.trim()) {
-    showToast('⚠️ Step 3의 탐구 질문을 작성해주세요', true);
-    document.getElementById('exploreQ').focus();
+  if(!document.getElementById('e1_q').value.trim()) {
+    showToast('⚠️ Step 3의 첫 번째 탐구 질문을 작성해주세요', true);
+    document.getElementById('e1_q').focus();
     return;
   }
 
   setLoading(true);
 
+  // Q2 속성 데이터 취합
+  const attrData = {};
+  ATTRIBUTES.forEach(a => {
+    attrData[a.name] = {
+      desc: document.getElementById(a.id+'_desc')?.value || '',
+      type: document.getElementById(a.id+'_type')?.value || '',
+    };
+  });
+
   const payload = {
-    studentClass:   cls,
-    studentName:    name,
-    q1:             document.getElementById('q1').value,
-    q2:             document.getElementById('q2').value,
-    q3:             document.getElementById('q3').value,
-    q4:             document.getElementById('q4').value,
-    exploreQ:       document.getElementById('exploreQ').value,
-    exploreVars:    document.getElementById('exploreVars').value,
-    exploreReason:  document.getElementById('exploreReason').value,
-    exploreDesc:    document.getElementById('exploreDesc').value,
-    exploreReflect: document.getElementById('exploreReflect').value,
-    imageBase64:    imageBase64 || '',
+    studentClass:  cls,
+    studentNumber: num,
+    studentName:   name,
+    q1_topic:      document.getElementById('q1_topic').value,
+    q1_attrs:      document.getElementById('q1_attrs').value,
+    q1_rows:       document.getElementById('q1_rows').value,
+    q2_attrs:      JSON.stringify(attrData),
+    q3:            document.getElementById('q3').value,
+    q4_calc:       document.getElementById('q4_calc').value,
+    q4_desc:       document.getElementById('q4_desc').value,
+    image_q4:      imageStore.q4 || '',
+    e1_q:          document.getElementById('e1_q').value,
+    e1_vars:       document.getElementById('e1_vars').value,
+    e1_reason:     document.getElementById('e1_reason').value,
+    e1_desc:       document.getElementById('e1_desc').value,
+    image_e1:      imageStore.e1 || '',
+    e2_q:          document.getElementById('e2_q').value,
+    e2_vars:       document.getElementById('e2_vars').value,
+    e2_reason:     document.getElementById('e2_reason').value,
+    e2_desc:       document.getElementById('e2_desc').value,
+    image_e2:      imageStore.e2 || '',
+    e3_q:          document.getElementById('e3_q').value,
+    e3_vars:       document.getElementById('e3_vars').value,
+    e3_reason:     document.getElementById('e3_reason').value,
+    e3_desc:       document.getElementById('e3_desc').value,
+    image_e3:      imageStore.e3 || '',
   };
 
-  // URL 미설정 → 테스트 모드
-  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
+  if(APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
     saveAll();
     await new Promise(r => setTimeout(r, 800));
     setLoading(false);
-    openModal('(테스트 모드 — Apps Script URL 미설정)');
+    openModal('(테스트 모드 — URL 미설정)');
     return;
   }
 
   try {
-    // Apps Script는 CORS 위해 Content-Type을 text/plain으로
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (data.status === 'ok') {
-      saveAll();
-      openModal();
-    } else {
-      throw new Error(data.message || '서버 오류가 발생했습니다');
-    }
-  } catch (err) {
+    if(data.status === 'ok') { saveAll(); openModal(); }
+    else throw new Error(data.message || '서버 오류');
+  } catch(err) {
     showToast('❌ 제출 실패: ' + err.message, true);
-    console.error('Submit error:', err);
+    console.error(err);
   } finally {
     setLoading(false);
   }
@@ -592,16 +793,24 @@ function setLoading(on) {
   document.getElementById('submitBtnText').textContent = on ? '제출 중...' : '제출하기 →';
   document.getElementById('spinner').style.display = on ? 'block' : 'none';
 }
-
-function openModal(note = '') {
-  const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-  document.getElementById('submitTime').textContent = `제출 시각: ${now}${note ? ' ' + note : ''}`;
+function openModal(note='') {
+  const now = new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'});
+  document.getElementById('submitTime').textContent = `제출 시각: ${now}${note?' '+note:''}`;
   document.getElementById('modalBg').classList.add('open');
 }
 function closeModal() {
   document.getElementById('modalBg').classList.remove('open');
   showToast('✅ 제출 완료! 수고하셨습니다');
 }
+
+// ── Init ──
+window.addEventListener('DOMContentLoaded', () => {
+  if(APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')
+    document.getElementById('setupBanner').classList.add('show');
+  loadAll();
+  updateProgress();
+  document.querySelectorAll('textarea.answer-input').forEach(el => updateCharCount(el));
+});
 </script>
 </body>
 </html>
