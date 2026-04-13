@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 질문 분류기</title>
+  <style>
+    :root {
+      --primary:        #6C63FF;
+      --primary-dark:   #574FD6;
+      --factual-c:      #D97706;
+      --factual-bg:     #FFFBEB;
+      --factual-bd:     #FCD34D;
+      --conceptual-c:   #1D4ED8;
+      --conceptual-bg:  #EFF6FF;
+      --conceptual-bd:  #93C5FD;
+      --debatable-c:    #7C3AED;
+      --debatable-bg:   #F5F3FF;
+      --debatable-bd:   #C4B5FD;
+      --bg:             #F0F2F8;
+      --card:           #FFFFFF;
+      --text:           #1E1E2E;
+      --muted:          #6B7280;
+      --border:         #E5E7EB;
+      --shadow:         0 4px 24px rgba(108,99,255,.10);
+      --r:              16px;
+      --rs:             10px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+         background:var(--bg);color:var(--text);min-height:100vh}
+
+    /* ── HEADER ── */
+    .hd{
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color:#fff;padding:1.4rem 1rem 1rem;text-align:center;position:relative;overflow:hidden
+    }
+    .hd::before{
+      content:'';position:absolute;top:-40%;left:-30%;width:160%;height:180%;
+      background:radial-gradient(circle,rgba(255,255,255,.12) 0%,transparent 60%);
+      animation:hdPulse 5s ease-in-out infinite
+    }
+    @keyframes hdPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+    .hd h1{font-size:1.7rem;font-weight:800;letter-spacing:-.5px;position:relative}
+    .hd p{font-size:.88rem;opacity:.9;margin-top:.35rem;position:relative}
+    .hd-stats{
+      display:flex;justify-content:center;flex-wrap:wrap;
+      gap:.6rem;margin-top:.9rem;position:relative
+    }
+    .hd-stat{
+      background:rgba(255,255,255,.2);backdrop-filter:blur(8px);
+      padding:.25rem .8rem;border-radius:20px;font-size:.8rem;font-weight:600
+    }
+
+    /* ── CONTAINER ── */
+    .wrap{max-width:860px;margin:0 auto;padding:1.4rem 1rem 3rem}
+
+    /* ── CARD ── */
+    .card{background:var(--card);border-radius:var(--r);padding:1.4rem;
+          box-shadow:var(--shadow);margin-bottom:1.4rem}
+    .ctitle{font-size:1.05rem;font-weight:700;margin-bottom:1rem;
+            display:flex;align-items:center;gap:.45rem}
+
+    /* ── FORM ── */
+    .fg2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.8rem}
+    .fg{display:flex;flex-direction:column;gap:.25rem}
+    .fg label{font-size:.75rem;font-weight:700;color:var(--muted);
+              text-transform:uppercase;letter-spacing:.4px}
+    .fg input,.fg select,.fg textarea{
+      border:2px solid var(--border);border-radius:var(--rs);
+      padding:.55rem .8rem;font-size:.9rem;color:var(--text);
+      background:#FAFAFA;transition:border-color .2s;outline:none;
+      font-family:inherit
+    }
+    .fg input:focus,.fg select:focus,.fg textarea:focus{
+      border-color:var(--primary);background:#fff
+    }
+    .fg textarea{width:100%;min-height:95px;resize:vertical;line-height:1.65}
+    .cc{text-align:right;font-size:.72rem;color:var(--muted);margin-top:.2rem}
+    .cc.warn{color:#DC2626}
+
+    /* ── BUTTON ── */
+    .sbtn{
+      width:100%;padding:.85rem;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color:#fff;border:none;border-radius:var(--rs);font-size:.98rem;
+      font-weight:700;cursor:pointer;transition:all .3s;
+      position:relative;overflow:hidden;font-family:inherit
+    }
+    .sbtn:hover:not(:disabled){transform:translateY(-2px);
+      box-shadow:0 8px 28px rgba(102,126,234,.45)}
+    .sbtn:active{transform:translateY(0)}
+    .sbtn:disabled{opacity:.65;cursor:not-allowed}
+    .sbtn.loading::after{
+      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+      animation:shim 1.4s infinite
+    }
+    @keyframes shim{0%{left:-100%}100%{left:100%}}
+
+    .rbtn{
+      background:none;border:1.5px solid var(--border);border-radius:var(--rs);
+      padding:.32rem .75rem;font-size:.75rem;color:var(--muted);
+      cursor:pointer;transition:all .2s;font-family:inherit
+    }
+    .rbtn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+    /* ── RESULT ── */
+    .result-card{display:none}
+    .result-card.show{display:block;animation:slideIn .45s ease}
+    @keyframes slideIn{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+
+    .grade-box{
+      text-align:center;padding:1.4rem 1rem;border-radius:var(--rs);margin-bottom:.9rem
+    }
+    .grade-box.factual  {background:var(--factual-bg); border:2px solid var(--factual-bd)}
+    .grade-box.conceptual{background:var(--conceptual-bg);border:2px solid var(--conceptual-bd)}
+    .grade-box.debatable{background:var(--debatable-bg);border:2px solid var(--debatable-bd)}
+
+    .g-emoji{font-size:3.4rem;display:block;margin-bottom:.4rem;
+             animation:emojiPop .55s cubic-bezier(.36,.07,.19,.97)}
+    @keyframes emojiPop{
+      0%{transform:scale(0) rotate(-20deg)}
+      60%{transform:scale(1.25) rotate(6deg)}
+      80%{transform:scale(.94) rotate(-3deg)}
+      100%{transform:scale(1) rotate(0)}
+    }
+    .g-name{font-size:1.35rem;font-weight:800}
+    .g-name.factual  {color:var(--factual-c)}
+    .g-name.conceptual{color:var(--conceptual-c)}
+    .g-name.debatable{color:var(--debatable-c)}
+    .g-label{font-size:.85rem;color:var(--muted);margin-top:.15rem}
+    .stars{display:flex;justify-content:center;gap:.25rem;margin:.7rem 0}
+    .star{font-size:1.4rem}
+    .star.lit{animation:starPop .3s ease}
+    @keyframes starPop{from{transform:scale(0) rotate(-30deg);opacity:0}
+                       to{transform:scale(1) rotate(0);opacity:1}}
+    .prog-wrap{background:var(--border);border-radius:10px;height:8px;
+               margin:.3rem 1rem 0;overflow:hidden}
+    .prog-bar{height:100%;border-radius:10px;transition:width 1s ease;width:0}
+    .prog-bar.factual  {background:linear-gradient(90deg,#FCD34D,#F59E0B)}
+    .prog-bar.conceptual{background:linear-gradient(90deg,#93C5FD,#3B82F6)}
+    .prog-bar.debatable{background:linear-gradient(90deg,#C4B5FD,#8B5CF6)}
+
+    .fb-box{background:#F9FAFB;border-radius:var(--rs);padding:.9rem 1rem;margin-bottom:.8rem}
+    .fb-box p{font-size:.88rem;line-height:1.75;color:var(--text)}
+    .tips-box{border-radius:var(--rs);padding:.9rem 1rem;font-size:.85rem;line-height:1.75}
+    .tips-box.factual  {background:#FFFBEB;border-left:4px solid var(--factual-c)}
+    .tips-box.conceptual{background:#EFF6FF;border-left:4px solid var(--conceptual-c)}
+    .tips-box.debatable{background:#F5F3FF;border-left:4px solid var(--debatable-c)}
+
+    /* ── SECTION HEADER ── */
+    .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem}
+
+    /* ── FEED ── */
+    .feed-list{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+    .feed-item{
+      display:flex;align-items:flex-start;gap:.75rem;padding:.75rem .9rem;
+      background:#FAFAFA;border:1px solid var(--border);border-radius:var(--rs);
+      animation:fadeSlide .35s ease
+    }
+    @keyframes fadeSlide{from{opacity:0;transform:translateX(-8px)}
+                         to{opacity:1;transform:translateX(0)}}
+    .feed-ico{font-size:1.3rem;flex-shrink:0;margin-top:.05rem}
+    .feed-body{flex:1;min-width:0}
+    .feed-q{font-size:.86rem;line-height:1.55;word-break:break-all}
+    .feed-meta{font-size:.72rem;color:var(--muted);margin-top:.22rem;
+               display:flex;align-items:center;flex-wrap:wrap;gap:.35rem}
+    .badge{font-size:.68rem;padding:.12rem .45rem;border-radius:8px;font-weight:700}
+    .badge.factual  {background:var(--factual-bg); color:var(--factual-c); border:1px solid var(--factual-bd)}
+    .badge.conceptual{background:var(--conceptual-bg);color:var(--conceptual-c);border:1px solid var(--conceptual-bd)}
+    .badge.debatable{background:var(--debatable-bg);color:var(--debatable-c);border:1px solid var(--debatable-bd)}
+
+    /* ── RANKING ── */
+    .rank-list{display:flex;flex-direction:column;gap:.6rem}
+    .rank-item{
+      display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;
+      background:#FAFAFA;border:1px solid var(--border);border-radius:var(--rs);
+      transition:transform .2s,box-shadow .2s
+    }
+    .rank-item:hover{transform:translateX(4px);box-shadow:0 2px 12px rgba(0,0,0,.07)}
+    .rn{font-size:1.1rem;font-weight:800;min-width:2.2rem;text-align:center}
+    .rn.r1{color:#F59E0B}.rn.r2{color:#9CA3AF}.rn.r3{color:#B45309}
+    .rn.rx{font-size:.85rem;color:var(--muted);font-weight:600}
+    .r-ico{font-size:1.35rem;flex-shrink:0}
+    .r-body{flex:1;min-width:0}
+    .r-q{font-size:.86rem;line-height:1.55;word-break:break-all}
+    .r-info{font-size:.72rem;color:var(--muted);margin-top:.2rem;
+            display:flex;align-items:center;flex-wrap:wrap;gap:.35rem}
+    .r-stars{font-size:.75rem;letter-spacing:1px}
+
+    /* toggle – 전체 보기 */
+    .toggle-btn{
+      display:block;width:100%;margin-top:1rem;padding:.6rem;
+      background:none;border:2px dashed var(--border);border-radius:var(--rs);
+      font-size:.85rem;color:var(--muted);cursor:pointer;transition:all .2s;
+      font-family:inherit;font-weight:600
+    }
+    .toggle-btn:hover{border-color:var(--primary);color:var(--primary);background:#F5F3FF}
+
+    /* ── EMPTY ── */
+    .empty{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.88rem}
+    .empty-ico{font-size:2.4rem;margin-bottom:.5rem}
+
+    /* ── LOADING ── */
+    .loading-msg{text-align:center;padding:1.2rem;color:var(--muted);font-size:.85rem}
+    .dots{display:inline-flex;gap:4px;vertical-align:middle}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--primary);
+         animation:dotB 1.2s ease-in-out infinite}
+    .dot:nth-child(2){animation-delay:.2s}
+    .dot:nth-child(3){animation-delay:.4s}
+    @keyframes dotB{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+    /* ── TOAST ── */
+    .toast{
+      position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);
+      padding:.7rem 1.4rem;border-radius:var(--rs);font-size:.83rem;font-weight:600;
+      z-index:9999;display:none;white-space:nowrap;
+      animation:toastUp .3s ease
+    }
+    .toast.err{background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C}
+    .toast.ok {background:#F0FDF4;border:1px solid #BBF7D0;color:#166534}
+    @keyframes toastUp{from{bottom:0;opacity:0}to{bottom:1rem;opacity:1}}
+
+    @media(max-width:480px){
+      .hd h1{font-size:1.4rem}
+      .fg2{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="hd">
+  <h1>🤖 AI 질문 분류기</h1>
+  <p>질문을 입력하면 AI가 수준을 분석하고 피드백을 드립니다</p>
+  <div class="hd-stats">
+    <div class="hd-stat">🐣 <span id="hd-f">0</span></div>
+    <div class="hd-stat">🐓 <span id="hd-c">0</span></div>
+    <div class="hd-stat">🦕 <span id="hd-d">0</span></div>
+    <div class="hd-stat">📝 총 <span id="hd-tot">0</span>개</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ══ 입력 폼 ══ -->
+  <div class="card">
+    <div class="ctitle">📝 질문 입력</div>
+    <div class="fg2">
+      <div class="fg">
+        <label>학년</label>
+        <select id="ig">
+          <option value="">선택</option>
+          <option>1학년</option><option>2학년</option><option>3학년</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>반</label>
+        <input type="number" id="ic" placeholder="1" min="1" max="20">
+      </div>
+      <div class="fg">
+        <label>번호</label>
+        <input type="number" id="in" placeholder="1" min="1" max="50">
+      </div>
+      <div class="fg">
+        <label>이름</label>
+        <input type="text" id="iname" placeholder="홍길동" maxlength="10">
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:.5rem">
+      <label>질문 내용</label>
+      <textarea id="iq" placeholder="궁금한 점을 자세하게 써보세요. 더 구체적으로 쓸수록 높은 등급을 받을 수 있어요!" maxlength="500"></textarea>
+      <div class="cc"><span id="qlen">0</span>/500자</div>
+    </div>
+    <button class="sbtn" id="sbtn" onclick="submitQ()">✨ 질문 제출하기</button>
+  </div>
+
+  <!-- ══ 분석 결과 ══ -->
+  <div class="card result-card" id="res-card">
+    <div class="ctitle">💫 분석 결과</div>
+    <div class="grade-box" id="g-box">
+      <span class="g-emoji" id="g-emoji">🐣</span>
+      <div class="g-name" id="g-name">병아리 등급</div>
+      <div class="g-label" id="g-label">사실적 질문</div>
+      <div class="stars" id="stars"></div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog"></div></div>
+    </div>
+    <div class="fb-box"><p id="fb-msg"></p></div>
+    <div class="tips-box" id="tips-box"><p id="tips-msg"></p></div>
+  </div>
+
+  <!-- ══ 실시간 피드 ══ -->
+  <div class="card">
+    <div class="sh">
+      <div class="ctitle" style="margin:0">📡 실시간 질문 피드</div>
+      <button class="rbtn" onclick="loadData()">🔄 새로고침</button>
+    </div>
+    <div id="feed-area">
+      <div class="loading-msg"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div> 불러오는 중…</div>
+    </div>
+  </div>
+
+  <!-- ══ TOP 10 랭킹 ══ -->
+  <div class="card">
+    <div class="sh">
+      <div class="ctitle" style="margin:0">🏆 오늘의 TOP 10 질문</div>
+      <button class="rbtn" onclick="loadData()">🔄</button>
+    </div>
+    <div id="rank-area">
+      <div class="loading-msg"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div> 불러오는 중…</div>
+    </div>
+    <button class="toggle-btn" id="all-btn" onclick="toggleAll()" style="display:none">
+      📋 전체 질문 보기
+    </button>
+    <div id="all-area" style="display:none;margin-top:.8rem"></div>
+  </div>
+
+</div>
+
+<div class="toast err" id="toast-err"></div>
+<div class="toast ok"  id="toast-ok"></div>
+
+<script>
+// ────────────────────────────────────────────────────────────
+// 질문 유형 정보
+// ────────────────────────────────────────────────────────────
+const T = {
+  debatable:{
+    name:'논쟁적 질문', gradeName:'시조새', emoji:'🦕',
+    cls:'debatable', displayScore:5, internalBase:500, starCount:5, prog:100,
+    fb:'최고 수준의 논쟁적 질문입니다! 정답이 없고 다양한 관점이 충돌하는 이 질문은 수업에서 가장 깊은 토론을 만들어 낼 수 있어요. 비판적 사고와 가치 판단 능력이 뛰어난 학생이에요!',
+    tips:'🏆 완벽해요! 찬성·반대 근거를 각각 2가지씩 정리하고, 경제·윤리·사회적 관점으로 나눠 분석해 보세요. "내 입장은 무엇인가?"를 먼저 정한 뒤 반대 입장의 허점을 찾아보면 더욱 풍부한 토론을 이끌 수 있어요.'
+  },
+  conceptual:{
+    name:'개념적 질문', gradeName:'사춘기닭', emoji:'🐓',
+    cls:'conceptual', displayScore:3, internalBase:300, starCount:3, prog:60,
+    fb:'훌륭해요! 원리·관계·이유를 탐구하는 깊이 있는 질문입니다. 단순한 사실 확인을 넘어 "왜?" "어떻게?"를 묻고 있어 비판적 사고 능력이 돋보여요.',
+    tips:'💡 한 단계 더! 이 개념에 대해 "이것이 옳은가?", "더 나은 방법은 없을까?", "어느 쪽이 더 가치 있는가?"를 고민해보세요. 가치 판단·윤리적 시각을 더하면 시조새 등급으로 올라갈 수 있어요!'
+  },
+  factual:{
+    name:'사실적 질문', gradeName:'병아리', emoji:'🐣',
+    cls:'factual', displayScore:1, internalBase:100, starCount:1, prog:20,
+    fb:'좋은 시작이에요! 사실을 확인하는 기초적인 질문입니다. 모든 깊은 탐구는 이렇게 시작돼요. 이 사실을 바탕으로 더 깊이 파고들어 볼 수 있어요.',
+    tips:'💡 업그레이드 도전! "왜?" 또는 "어떻게?"를 붙여보세요. 예: "광합성이 무엇인가?" → "광합성은 왜 일어나는가?" → "광합성이 없다면 지구 생태계는 어떻게 달라질까?" 이렇게 단계별로 발전시켜 보세요!'
+  }
+};
+
+// ────────────────────────────────────────────────────────────
+// 질문 분류 (키워드 기반)
+// ────────────────────────────────────────────────────────────
+const DKW = [
+  '해야 하','해야 할','해야만','해야 되','이어야 하',
+  '옳은가','옳은지','옳다','그르다','잘못된',
+  '찬성','반대','지지해야','반박해야',
+  '어떻게 생각','어떤 입장','의견은','어떤 의견',
+  '가치가 있','가치 판단','더 가치','가치 있',
+  '윤리적','윤리 문제','도덕적','도덕 문제','도덕적으로',
+  '바람직한가','바람직하지','적절한가','정당한가','허용되어야',
+  '더 나은가','더 좋은가','더 나쁜가','어느 것이 더',
+  '해도 되는가','가능한가','허용되나','되어야 하는가',
+  '비판적으로','문제가 있는가','논란이','논쟁','동의하는가',
+  '어느 쪽이','어느 편이','어떤 것이 옳'
+];
+const CKW = [
+  '왜 ','왜?','왜요','어째서','무슨 이유',
+  '어떻게 되','어떻게 작동','어떻게 이루','어떻게 만',
+  '이유는','이유가','이유를','원인은','원인이',
+  '원리는','원리가','메커니즘','작동 방식','작동 원리',
+  '차이는','차이가','차이점','다른 점','다른가',
+  '관계는','관계가','어떤 관계','영향을 주','영향은',
+  '결과는','결과가','어떤 결과','어떻게 영향',
+  '의미는','의미가','어떤 의미','역할은','역할이',
+  '구조는','구조가','어떤 구조','과정은','어떤 과정',
+  '비교하면','공통점','유사점','어떤 방식','어떤 원리'
+];
+
+function classify(text) {
+  let d = 0, c = 0;
+  DKW.forEach(k=>{ if(text.includes(k)) d += k.length>3?3:2; });
+  CKW.forEach(k=>{ if(text.includes(k)) c += k.length>3?3:2; });
+
+  let type = 'factual';
+  if      (d>0 && d>=c) type = 'debatable';
+  else if (c>0)         type = 'conceptual';
+
+  const info     = T[type];
+  const lenBonus = Math.min(Math.floor(text.length/15), 15);
+  const kscore   = type==='debatable'?d : type==='conceptual'?c : 0;
+  return {
+    ...info,
+    internalScore: info.internalBase + kscore*5 + lenBonus
+  };
+}
+
+// ────────────────────────────────────────────────────────────
+// 폼 제출
+// ────────────────────────────────────────────────────────────
+let busy = false;
+
+document.getElementById('iq').addEventListener('input', function(){
+  const n = this.value.length;
+  document.getElementById('qlen').textContent = n;
+  document.getElementById('qlen').parentElement.className = 'cc'+(n>450?' warn':'');
+});
+
+function submitQ(){
+  if(busy) return;
+
+  const grade    = document.getElementById('ig').value.trim();
+  const classNum = document.getElementById('ic').value.trim();
+  const number   = document.getElementById('in').value.trim();
+  const name     = document.getElementById('iname').value.trim();
+  const question = document.getElementById('iq').value.trim();
+
+  if(!grade||!classNum||!number||!name||!question){
+    showToast('err','모든 항목을 입력해주세요.'); return;
+  }
+  if(question.length<5){
+    showToast('err','질문을 5자 이상 입력해주세요.'); return;
+  }
+
+  const cl = classify(question);
+
+  busy = true;
+  const btn = document.getElementById('sbtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 분석 중…';
+  btn.classList.add('loading');
+
+  setTimeout(()=>{
+    showResult(cl, name);
+
+    google.script.run
+      .withSuccessHandler(r=>{
+        busy = false;
+        btn.disabled = false;
+        btn.textContent = '✨ 질문 제출하기';
+        btn.classList.remove('loading');
+
+        if(r && r.success){
+          showToast('ok','✅ 질문이 저장되었습니다!');
+          document.getElementById('iq').value = '';
+          document.getElementById('qlen').textContent = '0';
+          loadData();
+        } else {
+          showToast('err','저장 실패: '+(r&&r.error||'알 수 없는 오류'));
+        }
+      })
+      .withFailureHandler(e=>{
+        busy = false;
+        btn.disabled = false;
+        btn.textContent = '✨ 질문 제출하기';
+        btn.classList.remove('loading');
+        showToast('err','오류: '+(e.message||e));
+      })
+      .saveQuestion({grade, classNum, number, name, question,
+        type:cl.cls, gradeName:cl.gradeName, emoji:cl.emoji,
+        internalScore:cl.internalScore, displayScore:cl.displayScore});
+  }, 700);
+}
+
+function showResult(cl, name){
+  const card = document.getElementById('res-card');
+  card.classList.add('show');
+  card.scrollIntoView({behavior:'smooth',block:'start'});
+
+  const gb = document.getElementById('g-box');
+  gb.className = 'grade-box ' + cl.cls;
+
+  document.getElementById('g-emoji').textContent = cl.emoji;
+  document.getElementById('g-name').textContent  = cl.gradeName + ' 등급';
+  document.getElementById('g-name').className    = 'g-name '+cl.cls;
+  document.getElementById('g-label').textContent = cl.name;
+
+  // 별점
+  const st = document.getElementById('stars');
+  st.innerHTML = '';
+  for(let i=0;i<5;i++){
+    const s = document.createElement('span');
+    s.className = 'star'+(i<cl.starCount?' lit':'');
+    s.style.animationDelay = (i*.1)+'s';
+    s.textContent = i<cl.starCount ? '⭐' : '☆';
+    st.appendChild(s);
+  }
+
+  // 프로그레스 바
+  const pb = document.getElementById('prog');
+  pb.className = 'prog-bar '+cl.cls;
+  pb.style.width = '0%';
+  setTimeout(()=>{ pb.style.width = cl.prog+'%'; }, 120);
+
+  document.getElementById('fb-msg').textContent   = name+' 학생, '+cl.fb;
+  document.getElementById('tips-box').className   = 'tips-box '+cl.cls;
+  document.getElementById('tips-msg').textContent = cl.tips;
+}
+
+// ────────────────────────────────────────────────────────────
+// 데이터 로드 & 렌더
+// ────────────────────────────────────────────────────────────
+let allQ = [];
+
+function loadData(){
+  google.script.run
+    .withSuccessHandler(r=>{
+      if(r && r.success){ allQ = r.data||[]; render(); }
+    })
+    .withFailureHandler(()=>{})
+    .getQuestions();
+}
+
+function render(){
+  // 헤더 통계
+  document.getElementById('hd-f').textContent   = allQ.filter(q=>q.type==='factual').length;
+  document.getElementById('hd-c').textContent   = allQ.filter(q=>q.type==='conceptual').length;
+  document.getElementById('hd-d').textContent   = allQ.filter(q=>q.type==='debatable').length;
+  document.getElementById('hd-tot').textContent = allQ.length;
+
+  renderFeed();
+  renderRanking();
+}
+
+function renderFeed(){
+  const el = document.getElementById('feed-area');
+  if(!allQ.length){
+    el.innerHTML = `<div class="empty"><div class="empty-ico">📭</div>아직 질문이 없어요. 첫 번째 질문을 남겨보세요!</div>`;
+    return;
+  }
+  const recent = [...allQ].sort((a,b)=>b.id-a.id).slice(0,5);
+  el.innerHTML = `<ul class="feed-list">${recent.map(q=>`
+    <li class="feed-item">
+      <span class="feed-ico">${esc(q.emoji)}</span>
+      <div class="feed-body">
+        <div class="feed-q">"${esc(q.question)}"</div>
+        <div class="feed-meta">
+          <span>${esc(q.grade)} ${esc(q.classNum)}반 ${esc(q.number)}번 ${esc(q.name)}</span>
+          <span>·</span><span>${esc(q.timestamp)}</span>
+          <span class="badge ${q.type}">${esc(q.gradeName)}</span>
+        </div>
+      </div>
+    </li>`).join('')}</ul>`;
+}
+
+function renderRanking(){
+  const el = document.getElementById('rank-area');
+  const btn= document.getElementById('all-btn');
+  if(!allQ.length){
+    el.innerHTML = `<div class="empty"><div class="empty-ico">🏆</div>아직 랭킹이 없어요. 질문을 제출하면 순위에 오릅니다!</div>`;
+    btn.style.display='none';
+    return;
+  }
+  const top10 = allQ.slice(0,10);
+  const M = ['🥇','🥈','🥉'];
+  el.innerHTML = `<div class="rank-list">${top10.map((q,i)=>`
+    <div class="rank-item">
+      <div class="rn ${i<3?'r'+(i+1):'rx'}">${i<3?M[i]:i+1}</div>
+      <div class="r-ico">${esc(q.emoji)}</div>
+      <div class="r-body">
+        <div class="r-q">"${esc(q.question)}"</div>
+        <div class="r-info">
+          <span>${esc(q.grade)} ${esc(q.classNum)}반 ${esc(q.number)}번 ${esc(q.name)}</span>
+          <span class="badge ${q.type}">${esc(q.gradeName)}</span>
+          <span class="r-stars">${'⭐'.repeat(q.displayScore)}${'☆'.repeat(5-q.displayScore)}</span>
+        </div>
+      </div>
+    </div>`).join('')}</div>`;
+  btn.style.display = allQ.length>10 ? 'block' : 'none';
+  btn.textContent = '📋 전체 질문 보기 (총 '+allQ.length+'개)';
+}
+
+let allVisible = false;
+function toggleAll(){
+  const area = document.getElementById('all-area');
+  const btn  = document.getElementById('all-btn');
+  allVisible = !allVisible;
+  if(allVisible){
+    const all = allQ;
+    const M=['🥇','🥈','🥉'];
+    area.innerHTML=`<div class="rank-list">${all.map((q,i)=>`
+      <div class="rank-item">
+        <div class="rn ${i<3?'r'+(i+1):'rx'}">${i<3?M[i]:i+1}</div>
+        <div class="r-ico">${esc(q.emoji)}</div>
+        <div class="r-body">
+          <div class="r-q">"${esc(q.question)}"</div>
+          <div class="r-info">
+            <span>${esc(q.grade)} ${esc(q.classNum)}반 ${esc(q.number)}번 ${esc(q.name)}</span>
+            <span class="badge ${q.type}">${esc(q.gradeName)}</span>
+            <span class="r-stars">${'⭐'.repeat(q.displayScore)}${'☆'.repeat(5-q.displayScore)}</span>
+          </div>
+        </div>
+      </div>`).join('')}</div>`;
+    area.style.display='block';
+    btn.textContent='🔼 접기';
+  } else {
+    area.style.display='none';
+    btn.textContent='📋 전체 질문 보기 (총 '+allQ.length+'개)';
+  }
+}
+
+// ────────────────────────────────────────────────────────────
+// 유틸
+// ────────────────────────────────────────────────────────────
+function esc(s){
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(type, msg){
+  const el = document.getElementById('toast-'+type);
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(()=>{ el.style.display='none'; }, 3200);
+}
+
+// ────────────────────────────────────────────────────────────
+// 초기 로드 + 30초 자동 갱신
+// ────────────────────────────────────────────────────────────
+window.onload = function(){
+  loadData();
+  setInterval(loadData, 30000);
+};
+</script>
+</body>
+</html>

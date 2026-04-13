@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>교사 대시보드 | AI 질문 분류 시스템</title>
+  <style>
+    :root{
+      --primary:   #3B4A6B;
+      --accent:    #6C63FF;
+      --f-c:#D97706;--f-bg:#FFFBEB;--f-bd:#FCD34D;
+      --c-c:#1D4ED8;--c-bg:#EFF6FF;--c-bd:#93C5FD;
+      --d-c:#7C3AED;--d-bg:#F5F3FF;--d-bd:#C4B5FD;
+      --bg:#F0F2F8;--card:#fff;--text:#1E1E2E;--muted:#6B7280;
+      --border:#E5E7EB;--shadow:0 4px 24px rgba(59,74,107,.10);
+      --r:16px;--rs:10px
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+         background:var(--bg);color:var(--text);min-height:100vh}
+
+    /* ── HEADER ── */
+    .hd{
+      background:linear-gradient(135deg,#2d3561 0%,#c05c7e 100%);
+      color:#fff;padding:1.4rem 1.5rem 1rem;display:flex;
+      align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem
+    }
+    .hd-left h1{font-size:1.55rem;font-weight:800;letter-spacing:-.4px}
+    .hd-left p{font-size:.83rem;opacity:.85;margin-top:.2rem}
+    .hd-right{display:flex;gap:.6rem;flex-wrap:wrap}
+    .hd-btn{
+      padding:.45rem 1rem;border-radius:var(--rs);font-size:.8rem;font-weight:700;
+      cursor:pointer;border:none;font-family:inherit;transition:all .2s
+    }
+    .hd-btn.refresh{background:rgba(255,255,255,.2);color:#fff}
+    .hd-btn.refresh:hover{background:rgba(255,255,255,.35)}
+    .hd-btn.dl{background:#fff;color:var(--primary)}
+    .hd-btn.dl:hover{background:#F0FDF4;color:#166534}
+
+    /* ── WRAP ── */
+    .wrap{max-width:1100px;margin:0 auto;padding:1.4rem 1rem 3rem}
+
+    /* ── STATS GRID ── */
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.4rem}
+    @media(max-width:640px){.stat-grid{grid-template-columns:1fr 1fr}}
+    .stat-card{
+      background:var(--card);border-radius:var(--r);padding:1.1rem 1.2rem;
+      box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.3rem
+    }
+    .stat-icon{font-size:1.8rem}
+    .stat-val{font-size:1.75rem;font-weight:800;line-height:1}
+    .stat-lbl{font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+    .stat-card.total .stat-val{color:var(--accent)}
+    .stat-card.fact  .stat-val{color:var(--f-c)}
+    .stat-card.conc  .stat-val{color:var(--c-c)}
+    .stat-card.deba  .stat-val{color:var(--d-c)}
+
+    /* ── CARD ── */
+    .card{background:var(--card);border-radius:var(--r);padding:1.4rem;
+          box-shadow:var(--shadow);margin-bottom:1.4rem}
+    .ctitle{font-size:1.05rem;font-weight:700;margin-bottom:1rem;
+            display:flex;align-items:center;gap:.45rem}
+    .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+
+    /* ── RANKING ── */
+    .rank-list{display:flex;flex-direction:column;gap:.65rem}
+    .rank-item{
+      display:flex;align-items:flex-start;gap:.85rem;
+      padding:.9rem 1.1rem;border-radius:var(--rs);border:2px solid var(--border);
+      transition:transform .2s,box-shadow .2s;background:#FAFAFA
+    }
+    .rank-item:hover{transform:translateX(5px);box-shadow:0 2px 14px rgba(0,0,0,.08)}
+    .rank-item.factual  {border-color:var(--f-bd);background:var(--f-bg)}
+    .rank-item.conceptual{border-color:var(--c-bd);background:var(--c-bg)}
+    .rank-item.debatable{border-color:var(--d-bd);background:var(--d-bg)}
+
+    .rn{font-size:1.25rem;font-weight:800;min-width:2.6rem;text-align:center;
+        flex-shrink:0;padding-top:.15rem}
+    .rn.r1{color:#F59E0B;font-size:1.4rem}
+    .rn.r2{color:#9CA3AF}
+    .rn.r3{color:#B45309}
+    .rn.rx{font-size:.9rem;color:var(--muted);font-weight:600}
+    .r-ico{font-size:1.5rem;flex-shrink:0;padding-top:.1rem}
+    .r-body{flex:1;min-width:0}
+    .r-q{font-size:.92rem;line-height:1.6;word-break:break-all;font-weight:500}
+    .r-meta{font-size:.75rem;color:var(--muted);margin-top:.3rem;
+            display:flex;align-items:center;flex-wrap:wrap;gap:.4rem}
+    .badge{font-size:.7rem;padding:.13rem .48rem;border-radius:8px;font-weight:700}
+    .badge.factual  {background:var(--f-bg);color:var(--f-c);border:1px solid var(--f-bd)}
+    .badge.conceptual{background:var(--c-bg);color:var(--c-c);border:1px solid var(--c-bd)}
+    .badge.debatable{background:var(--d-bg);color:var(--d-c);border:1px solid var(--d-bd)}
+    .r-stars{font-size:.8rem;letter-spacing:1px}
+
+    /* ── FULL TABLE ── */
+    .tbl-wrap{overflow-x:auto;margin-top:.8rem}
+    table{width:100%;border-collapse:collapse;font-size:.82rem}
+    th{background:#3B4A6B;color:#fff;padding:.6rem .75rem;
+       text-align:left;white-space:nowrap;font-weight:700}
+    td{padding:.55rem .75rem;border-bottom:1px solid var(--border);vertical-align:top}
+    tr:hover td{background:#F9FAFB}
+    td.q-cell{max-width:320px;word-break:break-word;line-height:1.5}
+
+    /* ── TOGGLE BTN ── */
+    .toggle-btn{
+      display:block;width:100%;margin-top:1rem;padding:.62rem;
+      background:none;border:2px dashed var(--border);border-radius:var(--rs);
+      font-size:.85rem;color:var(--muted);cursor:pointer;
+      transition:all .2s;font-family:inherit;font-weight:600
+    }
+    .toggle-btn:hover{border-color:var(--accent);color:var(--accent);background:#F5F3FF}
+
+    /* ── LOADING / EMPTY ── */
+    .loading-msg{text-align:center;padding:2rem;color:var(--muted);font-size:.88rem}
+    .dots{display:inline-flex;gap:4px;vertical-align:middle}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
+         animation:dotB 1.2s ease-in-out infinite}
+    .dot:nth-child(2){animation-delay:.2s}
+    .dot:nth-child(3){animation-delay:.4s}
+    @keyframes dotB{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+    .empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:.9rem}
+    .empty-ico{font-size:2.6rem;margin-bottom:.6rem}
+
+    /* ── TOAST ── */
+    .toast{
+      position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);
+      padding:.7rem 1.4rem;border-radius:var(--rs);font-size:.83rem;font-weight:600;
+      z-index:9999;display:none;white-space:nowrap
+    }
+    .toast.ok{background:#F0FDF4;border:1px solid #BBF7D0;color:#166534}
+
+    /* ── LAST UPDATE ── */
+    .last-up{font-size:.72rem;color:var(--muted);text-align:right;margin-top:.4rem}
+
+    @media(max-width:768px){
+      .hd{flex-direction:column;align-items:flex-start}
+      .stat-grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="hd">
+  <div class="hd-left">
+    <h1>📊 교사 대시보드</h1>
+    <p>AI 질문 분류 시스템 · 실시간 학생 질문 현황</p>
+  </div>
+  <div class="hd-right">
+    <button class="hd-btn refresh" onclick="loadData()">🔄 새로고침</button>
+    <button class="hd-btn dl"     onclick="downloadCSV()">⬇️ CSV 다운로드</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ══ 통계 카드 ══ -->
+  <div class="stat-grid">
+    <div class="stat-card total">
+      <div class="stat-icon">📝</div>
+      <div class="stat-val" id="s-total">—</div>
+      <div class="stat-lbl">전체 질문</div>
+    </div>
+    <div class="stat-card fact">
+      <div class="stat-icon">🐣</div>
+      <div class="stat-val" id="s-fact">—</div>
+      <div class="stat-lbl">병아리 (사실적)</div>
+    </div>
+    <div class="stat-card conc">
+      <div class="stat-icon">🐓</div>
+      <div class="stat-val" id="s-conc">—</div>
+      <div class="stat-lbl">사춘기닭 (개념적)</div>
+    </div>
+    <div class="stat-card deba">
+      <div class="stat-icon">🦕</div>
+      <div class="stat-val" id="s-deba">—</div>
+      <div class="stat-lbl">시조새 (논쟁적)</div>
+    </div>
+  </div>
+
+  <!-- ══ TOP 10 랭킹 ══ -->
+  <div class="card">
+    <div class="sh">
+      <div class="ctitle" style="margin:0">🏆 오늘의 최고 질문 TOP 10</div>
+      <div class="last-up">마지막 갱신: <span id="last-up-time">—</span></div>
+    </div>
+    <div id="rank-area">
+      <div class="loading-msg">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        데이터 불러오는 중…
+      </div>
+    </div>
+    <button class="toggle-btn" id="all-btn" onclick="toggleAll()" style="display:none">
+      📋 전체 질문 보기
+    </button>
+  </div>
+
+  <!-- ══ 전체 목록 (토글) ══ -->
+  <div class="card" id="all-card" style="display:none">
+    <div class="sh">
+      <div class="ctitle" style="margin:0">📋 전체 질문 목록</div>
+      <button class="toggle-btn" onclick="toggleAll()"
+              style="width:auto;margin:0;padding:.3rem .9rem;font-size:.78rem">✕ 닫기</button>
+    </div>
+    <div class="tbl-wrap" id="tbl-area"></div>
+  </div>
+
+</div>
+
+<div class="toast ok" id="toast-ok"></div>
+
+<script>
+let allQ = [];
+
+// ────────────────────────────────────────────────────────────
+// 데이터 로드
+// ────────────────────────────────────────────────────────────
+function loadData(){
+  document.getElementById('rank-area').innerHTML =
+    `<div class="loading-msg"><div class="dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div> 불러오는 중…</div>`;
+
+  google.script.run
+    .withSuccessHandler(r=>{
+      if(r && r.success){
+        allQ = r.data || [];
+        render();
+        document.getElementById('last-up-time').textContent = nowStr();
+      }
+    })
+    .withFailureHandler(()=>{
+      document.getElementById('rank-area').innerHTML =
+        `<div class="empty"><div class="empty-ico">⚠️</div>데이터를 불러오지 못했습니다.<br>새로고침을 눌러주세요.</div>`;
+    })
+    .getQuestions();
+}
+
+function render(){
+  // 통계
+  document.getElementById('s-total').textContent = allQ.length;
+  document.getElementById('s-fact').textContent  = allQ.filter(q=>q.type==='factual').length;
+  document.getElementById('s-conc').textContent  = allQ.filter(q=>q.type==='conceptual').length;
+  document.getElementById('s-deba').textContent  = allQ.filter(q=>q.type==='debatable').length;
+
+  renderRanking();
+}
+
+function renderRanking(){
+  const el  = document.getElementById('rank-area');
+  const btn = document.getElementById('all-btn');
+
+  if(!allQ.length){
+    el.innerHTML=`<div class="empty"><div class="empty-ico">🏆</div>아직 제출된 질문이 없습니다.</div>`;
+    btn.style.display='none'; return;
+  }
+
+  const top10 = allQ.slice(0,10);
+  const M=['🥇','🥈','🥉'];
+  el.innerHTML=`<div class="rank-list">${top10.map((q,i)=>`
+    <div class="rank-item ${q.type}">
+      <div class="rn ${i<3?'r'+(i+1):'rx'}">${i<3?M[i]:i+1}</div>
+      <div class="r-ico">${esc(q.emoji)}</div>
+      <div class="r-body">
+        <div class="r-q">"${esc(q.question)}"</div>
+        <div class="r-meta">
+          <span>${esc(q.grade)} ${esc(q.classNum)}반 ${esc(q.number)}번 ${esc(q.name)}</span>
+          <span>·</span>
+          <span class="badge ${q.type}">${esc(q.gradeName)} 등급</span>
+          <span class="r-stars">${'⭐'.repeat(q.displayScore)}${'☆'.repeat(5-q.displayScore)}</span>
+          <span style="margin-left:auto;font-size:.7rem;opacity:.6">${esc(q.timestamp)}</span>
+        </div>
+      </div>
+    </div>`).join('')}</div>`;
+
+  btn.style.display = allQ.length>10 ? 'block':'none';
+  btn.textContent = '📋 전체 질문 보기 (총 '+allQ.length+'개)';
+}
+
+// ────────────────────────────────────────────────────────────
+// 전체 목록 토글
+// ────────────────────────────────────────────────────────────
+let allVisible = false;
+function toggleAll(){
+  allVisible = !allVisible;
+  const card = document.getElementById('all-card');
+  const btn  = document.getElementById('all-btn');
+
+  if(allVisible){
+    renderTable();
+    card.style.display='block';
+    card.scrollIntoView({behavior:'smooth'});
+    btn.textContent = '🔼 전체 목록 접기';
+  } else {
+    card.style.display='none';
+    btn.textContent = '📋 전체 질문 보기 (총 '+allQ.length+'개)';
+  }
+}
+
+function renderTable(){
+  const area = document.getElementById('tbl-area');
+  if(!allQ.length){ area.innerHTML='<p style="padding:1rem;color:var(--muted)">질문이 없습니다.</p>'; return; }
+
+  const M=['🥇','🥈','🥉'];
+  area.innerHTML=`<table>
+    <thead><tr>
+      <th>순위</th><th>등급</th><th>학년/반/번/이름</th>
+      <th>질문 내용</th><th>유형</th><th>점수</th><th>시간</th>
+    </tr></thead>
+    <tbody>${allQ.map((q,i)=>`<tr>
+      <td style="text-align:center;font-weight:700">${i<3?M[i]:i+1}</td>
+      <td style="text-align:center;font-size:1.2rem">${esc(q.emoji)}</td>
+      <td style="white-space:nowrap">${esc(q.grade)} ${esc(q.classNum)}반<br>${esc(q.number)}번 ${esc(q.name)}</td>
+      <td class="q-cell">${esc(q.question)}</td>
+      <td><span class="badge ${q.type}">${esc(q.gradeName)}</span></td>
+      <td style="text-align:center">${'⭐'.repeat(q.displayScore)}</td>
+      <td style="white-space:nowrap;font-size:.72rem">${esc(q.timestamp)}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ────────────────────────────────────────────────────────────
+// CSV 다운로드
+// ────────────────────────────────────────────────────────────
+function downloadCSV(){
+  if(!allQ.length){ alert('다운로드할 데이터가 없습니다.'); return; }
+
+  const header = ['순위','학년','반','번호','이름','질문내용','질문유형','등급이름','점수','시간'];
+  const rows = allQ.map((q,i)=>[
+    i+1, q.grade, q.classNum, q.number, q.name,
+    '"'+String(q.question).replace(/"/g,'""')+'"',
+    q.type, q.gradeName, q.displayScore, q.timestamp
+  ]);
+
+  const csv = [header, ...rows].map(r=>r.join(',')).join('\n');
+  const bom  = '\uFEFF';
+  const blob = new Blob([bom+csv], {type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = '학생질문_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('데이터가 다운로드되었습니다.');
+}
+
+// ────────────────────────────────────────────────────────────
+// 유틸
+// ────────────────────────────────────────────────────────────
+function esc(s){
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function nowStr(){
+  const d=new Date();
+  return d.getHours().toString().padStart(2,'0')+':'+
+         d.getMinutes().toString().padStart(2,'0')+':'+
+         d.getSeconds().toString().padStart(2,'0');
+}
+function showToast(msg){
+  const el=document.getElementById('toast-ok');
+  el.textContent='✅ '+msg;
+  el.style.display='block';
+  setTimeout(()=>{ el.style.display='none'; },3000);
+}
+
+// ────────────────────────────────────────────────────────────
+// 초기 로드 + 30초 자동 갱신
+// ────────────────────────────────────────────────────────────
+window.onload = function(){
+  loadData();
+  setInterval(loadData, 30000);
+};
+</script>
+</body>
+</html>
