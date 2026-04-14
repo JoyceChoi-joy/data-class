@@ -456,7 +456,8 @@ function submitQ(){
       })
       .saveQuestion({grade, classNum, number, name, question,
         type:cl.cls, gradeName:cl.gradeName, emoji:cl.emoji,
-        internalScore:cl.internalScore, displayScore:cl.displayScore});
+        internalScore:cl.internalScore, displayScore:cl.displayScore,
+        feedbackMsg:cl.fb, tipsMsg:cl.tips});
   }, 700);
 }
 

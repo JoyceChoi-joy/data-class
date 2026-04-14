@@ -91,6 +91,15 @@
     .badge.debatable{background:var(--d-bg);color:var(--d-c);border:1px solid var(--d-bd)}
     .r-stars{font-size:.8rem;letter-spacing:1px}
 
+    /* ── DELETE BUTTON ── */
+    .del-btn{
+      flex-shrink:0;background:none;border:1.5px solid #FECACA;
+      border-radius:var(--rs);padding:.28rem .55rem;font-size:.8rem;
+      cursor:pointer;color:#EF4444;transition:all .2s;line-height:1;
+      align-self:flex-start;margin-top:.1rem
+    }
+    .del-btn:hover{background:#FEF2F2;border-color:#EF4444;transform:scale(1.08)}
+
     /* ── FULL TABLE ── */
     .tbl-wrap{overflow-x:auto;margin-top:.8rem}
     table{width:100%;border-collapse:collapse;font-size:.82rem}
@@ -270,6 +279,7 @@ function renderRanking(){
           <span style="margin-left:auto;font-size:.7rem;opacity:.6">${esc(q.timestamp)}</span>
         </div>
       </div>
+      <button class="del-btn" onclick="confirmDelete(${i})" title="삭제">🗑️</button>
     </div>`).join('')}</div>`;
 
   btn.style.display = allQ.length>10 ? 'block':'none';
@@ -304,18 +314,53 @@ function renderTable(){
   area.innerHTML=`<table>
     <thead><tr>
       <th>순위</th><th>등급</th><th>학년/반/번/이름</th>
-      <th>질문 내용</th><th>유형</th><th>점수</th><th>시간</th>
+      <th>질문 내용</th><th>피드백</th><th>유형</th><th>점수</th><th>시간</th><th>삭제</th>
     </tr></thead>
     <tbody>${allQ.map((q,i)=>`<tr>
       <td style="text-align:center;font-weight:700">${i<3?M[i]:i+1}</td>
       <td style="text-align:center;font-size:1.2rem">${esc(q.emoji)}</td>
       <td style="white-space:nowrap">${esc(q.grade)} ${esc(q.classNum)}반<br>${esc(q.number)}번 ${esc(q.name)}</td>
       <td class="q-cell">${esc(q.question)}</td>
+      <td class="q-cell" style="font-size:.78rem;color:var(--muted);white-space:pre-wrap">${esc(q.feedback)}</td>
       <td><span class="badge ${q.type}">${esc(q.gradeName)}</span></td>
       <td style="text-align:center">${'⭐'.repeat(q.displayScore)}</td>
       <td style="white-space:nowrap;font-size:.72rem">${esc(q.timestamp)}</td>
+      <td style="text-align:center">
+        <button class="del-btn" onclick="confirmDelete(${i})" title="삭제">🗑️</button>
+      </td>
     </tr>`).join('')}</tbody>
   </table>`;
+}
+
+// ────────────────────────────────────────────────────────────
+// 삭제
+// ────────────────────────────────────────────────────────────
+function confirmDelete(idx){
+  const q = allQ[idx];
+  if(!q) return;
+  const preview = q.question.length>60 ? q.question.slice(0,60)+'…' : q.question;
+  if(!confirm('다음 질문을 삭제하시겠습니까?\n\n"' + preview + '"\n\n' +
+              q.grade+' '+q.classNum+'반 '+q.number+'번 '+q.name)) return;
+
+  // 삭제 중 버튼 비활성화 방지를 위해 allQ에서 먼저 제거해 UI 갱신
+  allQ.splice(idx, 1);
+  render();
+
+  google.script.run
+    .withSuccessHandler(r=>{
+      if(r && r.success){
+        showToast('질문이 삭제되었습니다.');
+        loadData(); // 서버 재동기화
+      } else {
+        showToast('삭제 실패: '+(r&&r.error||'오류'));
+        loadData();
+      }
+    })
+    .withFailureHandler(err=>{
+      showToast('삭제 오류: '+(err.message||err));
+      loadData();
+    })
+    .deleteQuestion(q.sheetName, q.rowNum);
 }
 
 // ────────────────────────────────────────────────────────────
@@ -324,10 +369,11 @@ function renderTable(){
 function downloadCSV(){
   if(!allQ.length){ alert('다운로드할 데이터가 없습니다.'); return; }
 
-  const header = ['순위','학년','반','번호','이름','질문내용','질문유형','등급이름','점수','시간'];
+  const header = ['순위','학년','반','번호','이름','질문내용','피드백','질문유형','등급이름','점수','시간'];
   const rows = allQ.map((q,i)=>[
     i+1, q.grade, q.classNum, q.number, q.name,
     '"'+String(q.question).replace(/"/g,'""')+'"',
+    '"'+String(q.feedback||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',
     q.type, q.gradeName, q.displayScore, q.timestamp
   ]);
 
