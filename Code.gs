@@ -64,7 +64,7 @@ function getOrCreateClassSheet_(ss, sheetName) {
 function classifyWithGemini_(question, name) {
   const apiKey = getGeminiKey_();
   if (!apiKey) throw new Error('GEMINI_API_KEY 스크립트 속성이 설정되지 않았습니다.');
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey;
 
   const prompt =
     '당신은 학생의 질문 수준을 분석하는 교육 전문가입니다.\n\n' +
