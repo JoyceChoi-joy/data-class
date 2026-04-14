@@ -2,9 +2,12 @@
 // Code.gs – AI 학생 질문 분류 시스템 (Gemini API 연동)
 // ============================================================
 
-const SPREADSHEET_ID  = '1C7QvSfXDDxvy_IluJDYqi8WVh4byKmJfzUKJbuj1mIQ';
-const GEMINI_API_KEY  = 'YOUR_GEMINI_API_KEY_HERE'; // ← Gemini API 키 입력
-// API 키 발급: https://aistudio.google.com/app/apikey
+const SPREADSHEET_ID = '1C7QvSfXDDxvy_IluJDYqi8WVh4byKmJfzUKJbuj1mIQ';
+
+// API 키는 프로젝트 설정 → 스크립트 속성(GEMINI_API_KEY)에서 읽어옴
+function getGeminiKey_() {
+  return PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+}
 
 // ----------------------------------------------------------
 // doGet: ?page=student(기본) / ?page=teacher
@@ -58,7 +61,9 @@ function getOrCreateClassSheet_(ss, sheetName) {
 // Gemini API 호출: 질문 분류 + 피드백 생성
 // ----------------------------------------------------------
 function classifyWithGemini_(question, name) {
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_API_KEY;
+  const apiKey = getGeminiKey_();
+  if (!apiKey) throw new Error('GEMINI_API_KEY 스크립트 속성이 설정되지 않았습니다.');
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
 
   const prompt =
     '학생 질문 분류 전문가입니다. 아래 학생의 질문을 분석하고 JSON으로만 응답하세요.\n\n' +
