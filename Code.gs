@@ -58,7 +58,8 @@ function getOrCreateClassSheet_(ss, sheetName) {
 }
 
 // ----------------------------------------------------------
-// Gemini API 호출: 질문 분류 + 피드백 생성
+// Gemini API 호출: 질문 분류 + 맞춤형 피드백 생성
+// 키워드 폴백 없이 API 결과만 사용
 // ----------------------------------------------------------
 function classifyWithGemini_(question, name) {
   const apiKey = getGeminiKey_();
@@ -72,11 +73,16 @@ function classifyWithGemini_(question, name) {
 
     '[질문 수준 3단계]\n' +
     '1. factual(병아리): 하나의 정답이 있는 사실 확인 질문. "무엇?", "언제?", "누가?", "어디?" 등\n' +
-    '2. conceptual(사춘기닭): 원리·이유·관계·과정을 탐구하는 질문. "왜?", "어떻게?", "차이는?", "원인은?" 등\n' +
+    '2. conceptual(사춘기닭): 원리·이유·관계·과정을 탐구하는 질문. "왜?", "어떻게?", "차이는?", "원인은?", "어쩌다?", "어떤 과정?" 등\n' +
     '3. debatable(시조새): 정답이 없고 가치 판단·토론이 필요한 질문. "옳은가?", "해야 하는가?", "어떤 것이 더 나은가?" 등\n\n' +
 
+    '[분류 판단 기준 — 반드시 질문의 의미와 맥락을 읽어서 판단할 것]\n' +
+    '- 사실 확인(factual): 단순히 "무엇인지", "누구인지", "어디인지"처럼 정해진 답이 있는 경우\n' +
+    '- 개념·과정 탐구(conceptual): 인과관계, 변화 과정, 이유, 원리를 묻는 경우. 예) "왜 그렇게 되었을까?", "어쩌다 ~하게 됐을까?", "어떻게 ~할 수 있었을까?" 등 과정·원인을 탐구하는 질문은 conceptual\n' +
+    '- 가치 판단·토론(debatable): 옳고 그름, 선택의 정당성, 찬반이 갈리는 경우\n\n' +
+
     '[분석 요청]\n' +
-    '① type: 위 세 수준 중 하나로 분류\n' +
+    '① type: 위 세 수준 중 하나로 분류 (factual / conceptual / debatable)\n' +
     '② feedback: 이 질문이 해당 수준으로 분류된 이유를, 질문의 구체적인 표현·구조·의도를 짚어서 설명 (2~3문장, ' + name + ' 학생에게 직접 말하는 친근한 톤)\n' +
     '③ tips: 이 질문을 한 단계 더 높은 수준으로 바꾸는 방법 설명 (debatable이면 질문을 더 풍부하게 만드는 방법) (2문장)\n' +
     '④ example: ③의 방법을 적용해서 이 질문을 직접 변형한 업그레이드 예시 질문 1개 (질문 형식으로, 짧고 구체적으로)\n\n' +
@@ -92,9 +98,9 @@ function classifyWithGemini_(question, name) {
   const payload = {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
-      temperature: 0,           // 일관된 분류를 위해 0으로 고정
+      temperature: 0,
       maxOutputTokens: 600,
-      responseMimeType: 'application/json' // 순수 JSON만 반환하도록 강제
+      responseMimeType: 'application/json'
     }
   };
 
@@ -117,91 +123,12 @@ function classifyWithGemini_(question, name) {
 
   const result = JSON.parse(cleaned);
 
-  // type 값 검증: 허용 값 외에는 키워드로 재분류
-  if (!['factual','conceptual','debatable'].includes(result.type)) {
-    result.type = classifyByKeyword_(rawText).type;
+  // type 값이 허용 범위 밖이면 에러 (키워드 폴백 없음)
+  if (!['factual', 'conceptual', 'debatable'].includes(result.type)) {
+    throw new Error('Gemini가 유효하지 않은 type을 반환했습니다: ' + result.type);
   }
+
   return result;
-}
-
-// ----------------------------------------------------------
-// 키워드 기반 폴백 분류 (Gemini API 실패 시)
-// ----------------------------------------------------------
-function classifyByKeyword_(question) {
-  const t = question;
-
-  // 논쟁적 키워드 — 어근 단위로 광범위하게 설정
-  // '옳은가', '옳은 선택인가', '옳은지' 모두 '옳은'으로 잡음
-  const DKW = [
-    '해야 하', '해야 할', '해야 되', '이어야 하', '해야만',
-    '찬성', '반대',
-    '옳은', '그른', '잘못된',
-    '윤리', '도덕', '가치 판단', '가치 있',
-    '바람직', '적절한', '정당한', '합리적인', '불합리',
-    '공정한', '불공정', '허용', '금지해야',
-    '어떻게 생각', '어떤 입장', '어느 쪽',
-    '더 나은가', '더 좋은가', '더 나쁜가',
-    '해도 되는', '해도 될까', '해도 되나',
-    '필요한가', '필요할까', '필요한지',
-    '선택인가', '선택해야', '결정인가',
-    '지속해야', '유지해야', '폐지해야', '도입해야',
-    '동의', '반론', '논쟁', '논란'
-  ];
-
-  // 개념적 키워드
-  const CKW = [
-    '왜 ', '왜?', '왜요', '어째서', '무슨 이유',
-    '어떻게 되', '어떻게 작동', '어떻게 이루', '어떻게 만',
-    '어떻게 해서', '어떻게 생각',
-    '이유는', '이유가', '원인은', '원인이',
-    '원리는', '원리가', '메커니즘', '작동 방식',
-    '차이는', '차이가', '차이점', '다른 점',
-    '관계는', '관계가', '어떤 관계',
-    '영향을', '영향은', '의미는', '의미가',
-    '역할은', '역할이', '구조는', '과정은',
-    '비교하면', '공통점', '유사점',
-    // 인과·과정·변화를 묻는 표현
-    '어쩌다', '어떤 계기', '어떤 과정', '어떤 이유',
-    '무슨 일이', '무슨 계기', '무슨 이유',
-    '왜 그런', '왜 그렇게', '왜 그게', '왜 이런', '왜 이렇게',
-    '어떤 일이', '어떤 사건',
-    '어떻게 변', '어떻게 극복', '어떻게 해결', '어떻게 성장',
-    '어떻게 알게', '어떻게 느끼', '어떻게 달라',
-    '되었을까', '됐을까', '되었나', '됐나',
-    '잃게 된', '찾게 된', '갖게 된', '알게 된',
-    '변하게 된', '바뀌게 된', '겪게 된',
-    '겪었을까', '느꼈을까', '생각했을까', '선택했을까'
-  ];
-
-  let d = 0, c = 0;
-  DKW.forEach(function(k){ if(t.includes(k)) d++; });
-  CKW.forEach(function(k){ if(t.includes(k)) c++; });
-
-  // 가치 판단 형용사 단독으로도 강하게 debatable 점수 부여
-  // "옳은 선택인가", "정당한 행동인가" 등 포함
-  ['옳','그른','바람직','적절','정당','공정','불공정','윤리','도덕','합리'].forEach(function(adj){
-    if(t.includes(adj)) d += 2;
-  });
-
-  const type = (d > 0 && d >= c) ? 'debatable' : (c > 0 ? 'conceptual' : 'factual');
-  const MSG = {
-    factual:   {
-      feedback: '사실을 확인하는 기초 질문입니다. 모든 깊은 탐구는 이렇게 시작돼요!',
-      tips: '"왜?" 또는 "어떻게?"를 붙여보세요. 사실 뒤에 숨은 원리를 탐구하면 한 단계 높은 질문이 됩니다.',
-      example: ''
-    },
-    conceptual: {
-      feedback: '원리와 관계를 탐구하는 깊이 있는 질문입니다. 비판적 사고가 돋보여요!',
-      tips: '"이것이 옳은가?", "어느 것이 더 나은가?"처럼 가치 판단을 더하면 논쟁적 질문으로 발전해요.',
-      example: ''
-    },
-    debatable: {
-      feedback: '정답이 없는 최고 수준의 논쟁적 질문입니다! 다양한 관점에서 토론이 가능해요.',
-      tips: '찬성·반대 근거를 각각 정리하고 경제·윤리·사회적 관점으로 나눠 분석해보세요.',
-      example: ''
-    }
-  };
-  return { type: type, feedback: MSG[type].feedback, tips: MSG[type].tips, example: '' };
 }
 
 // ----------------------------------------------------------
@@ -212,7 +139,7 @@ function submitQuestion(data) {
     const name     = String(data.name     || '');
     const question = String(data.question || '');
 
-    // 1. Gemini API로 분류 (실패 시 에러 반환 — 키워드 폴백 사용 안 함)
+    // Gemini API로만 분류 — 실패 시 에러 반환 (키워드 폴백 없음)
     let aiResult;
     try {
       aiResult = classifyWithGemini_(question, name);
@@ -221,7 +148,7 @@ function submitQuestion(data) {
       return { success: false, error: 'AI 분류에 실패했습니다. 잠시 후 다시 시도해 주세요.\n(상세: ' + aiErr.message + ')' };
     }
 
-    // 2. 유형별 메타데이터
+    // 유형별 메타데이터
     const TYPE_META = {
       factual:    { gradeName:'병아리',   emoji:'🐣', displayScore:1, internalBase:100 },
       conceptual: { gradeName:'사춘기닭', emoji:'🐓', displayScore:3, internalBase:300 },
@@ -231,7 +158,7 @@ function submitQuestion(data) {
     const lenBonus      = Math.min(Math.floor(question.length / 15), 15);
     const internalScore = meta.internalBase + lenBonus;
 
-    // 3. 시트 저장
+    // 시트 저장
     const ss        = SpreadsheetApp.openById(SPREADSHEET_ID);
     const sheetName = buildSheetName_(data.grade, data.classNum);
     const sheet     = getOrCreateClassSheet_(ss, sheetName);
@@ -255,7 +182,7 @@ function submitQuestion(data) {
       meta.displayScore
     ]);
 
-    // 4. 클라이언트에 결과 반환
+    // 클라이언트에 결과 반환
     return {
       success:      true,
       type:         aiResult.type    || 'factual',
