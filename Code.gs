@@ -98,8 +98,7 @@ function classifyWithGemini_(question, name) {
   const payload = {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
-      temperature: 0,
-      maxOutputTokens: 600
+      maxOutputTokens: 1024
     }
   };
 
@@ -114,17 +113,15 @@ function classifyWithGemini_(question, name) {
   if (resJson.error) throw new Error('Gemini 오류: ' + resJson.error.message);
 
   const rawText = resJson.candidates[0].content.parts[0].text;
+  Logger.log('Gemini raw: ' + rawText);
 
-  // JSON 추출: 마크다운 코드블록 및 앞뒤 텍스트 제거
-  let cleaned = rawText
-    .replace(/```json\s*/g, '')
-    .replace(/```\s*/g, '')
-    .trim();
-  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('Gemini 응답에서 JSON을 찾을 수 없습니다: ' + rawText.slice(0, 100));
-  cleaned = jsonMatch[0];
-
-  const result = JSON.parse(cleaned);
+  // 첫 번째 { 부터 마지막 } 까지 잘라서 파싱 (마크다운·앞뒤 텍스트 무관)
+  const start = rawText.indexOf('{');
+  const end   = rawText.lastIndexOf('}');
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error('Gemini 응답에 JSON이 없습니다: ' + rawText.slice(0, 200));
+  }
+  const result = JSON.parse(rawText.slice(start, end + 1));
 
   // type 값이 허용 범위 밖이면 에러 (키워드 폴백 없음)
   if (!['factual', 'conceptual', 'debatable'].includes(result.type)) {
