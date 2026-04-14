@@ -323,78 +323,16 @@
 
 <script>
 // ────────────────────────────────────────────────────────────
-// 질문 유형 정보
+// 유형별 화면 표시 정보 (서버 AI 결과를 화면에 매핑)
 // ────────────────────────────────────────────────────────────
-const T = {
-  debatable:{
-    name:'논쟁적 질문', gradeName:'시조새', emoji:'🦕',
-    cls:'debatable', displayScore:5, internalBase:500, starCount:5, prog:100,
-    fb:'최고 수준의 논쟁적 질문입니다! 정답이 없고 다양한 관점이 충돌하는 이 질문은 수업에서 가장 깊은 토론을 만들어 낼 수 있어요. 비판적 사고와 가치 판단 능력이 뛰어난 학생이에요!',
-    tips:'🏆 완벽해요! 찬성·반대 근거를 각각 2가지씩 정리하고, 경제·윤리·사회적 관점으로 나눠 분석해 보세요. "내 입장은 무엇인가?"를 먼저 정한 뒤 반대 입장의 허점을 찾아보면 더욱 풍부한 토론을 이끌 수 있어요.'
-  },
-  conceptual:{
-    name:'개념적 질문', gradeName:'사춘기닭', emoji:'🐓',
-    cls:'conceptual', displayScore:3, internalBase:300, starCount:3, prog:60,
-    fb:'훌륭해요! 원리·관계·이유를 탐구하는 깊이 있는 질문입니다. 단순한 사실 확인을 넘어 "왜?" "어떻게?"를 묻고 있어 비판적 사고 능력이 돋보여요.',
-    tips:'💡 한 단계 더! 이 개념에 대해 "이것이 옳은가?", "더 나은 방법은 없을까?", "어느 쪽이 더 가치 있는가?"를 고민해보세요. 가치 판단·윤리적 시각을 더하면 시조새 등급으로 올라갈 수 있어요!'
-  },
-  factual:{
-    name:'사실적 질문', gradeName:'병아리', emoji:'🐣',
-    cls:'factual', displayScore:1, internalBase:100, starCount:1, prog:20,
-    fb:'좋은 시작이에요! 사실을 확인하는 기초적인 질문입니다. 모든 깊은 탐구는 이렇게 시작돼요. 이 사실을 바탕으로 더 깊이 파고들어 볼 수 있어요.',
-    tips:'💡 업그레이드 도전! "왜?" 또는 "어떻게?"를 붙여보세요. 예: "광합성이 무엇인가?" → "광합성은 왜 일어나는가?" → "광합성이 없다면 지구 생태계는 어떻게 달라질까?" 이렇게 단계별로 발전시켜 보세요!'
-  }
+const DISPLAY = {
+  factual:    { cls:'factual',    typeName:'사실적 질문', starCount:1, prog:20  },
+  conceptual: { cls:'conceptual', typeName:'개념적 질문', starCount:3, prog:60  },
+  debatable:  { cls:'debatable',  typeName:'논쟁적 질문', starCount:5, prog:100 }
 };
 
 // ────────────────────────────────────────────────────────────
-// 질문 분류 (키워드 기반)
-// ────────────────────────────────────────────────────────────
-const DKW = [
-  '해야 하','해야 할','해야만','해야 되','이어야 하',
-  '옳은가','옳은지','옳다','그르다','잘못된',
-  '찬성','반대','지지해야','반박해야',
-  '어떻게 생각','어떤 입장','의견은','어떤 의견',
-  '가치가 있','가치 판단','더 가치','가치 있',
-  '윤리적','윤리 문제','도덕적','도덕 문제','도덕적으로',
-  '바람직한가','바람직하지','적절한가','정당한가','허용되어야',
-  '더 나은가','더 좋은가','더 나쁜가','어느 것이 더',
-  '해도 되는가','가능한가','허용되나','되어야 하는가',
-  '비판적으로','문제가 있는가','논란이','논쟁','동의하는가',
-  '어느 쪽이','어느 편이','어떤 것이 옳'
-];
-const CKW = [
-  '왜 ','왜?','왜요','어째서','무슨 이유',
-  '어떻게 되','어떻게 작동','어떻게 이루','어떻게 만',
-  '이유는','이유가','이유를','원인은','원인이',
-  '원리는','원리가','메커니즘','작동 방식','작동 원리',
-  '차이는','차이가','차이점','다른 점','다른가',
-  '관계는','관계가','어떤 관계','영향을 주','영향은',
-  '결과는','결과가','어떤 결과','어떻게 영향',
-  '의미는','의미가','어떤 의미','역할은','역할이',
-  '구조는','구조가','어떤 구조','과정은','어떤 과정',
-  '비교하면','공통점','유사점','어떤 방식','어떤 원리'
-];
-
-function classify(text) {
-  let d = 0, c = 0;
-  DKW.forEach(k=>{ if(text.includes(k)) d += k.length>3?3:2; });
-  CKW.forEach(k=>{ if(text.includes(k)) c += k.length>3?3:2; });
-
-  let type = 'factual';
-  if      (d>0 && d>=c) type = 'debatable';
-  else if (c>0)         type = 'conceptual';
-
-  const info     = T[type];
-  const lenBonus = Math.min(Math.floor(text.length/15), 15);
-  const kscore   = type==='debatable'?d : type==='conceptual'?c : 0;
-  return {
-    ...info,
-    internalScore: info.internalBase + kscore*5 + lenBonus
-  };
-}
-
-// ────────────────────────────────────────────────────────────
-// 폼 제출
+// 폼 제출 → 서버(Gemini API)에서 분류·피드백 생성
 // ────────────────────────────────────────────────────────────
 let busy = false;
 
@@ -420,80 +358,76 @@ function submitQ(){
     showToast('err','질문을 5자 이상 입력해주세요.'); return;
   }
 
-  const cl = classify(question);
-
   busy = true;
   const btn = document.getElementById('sbtn');
   btn.disabled = true;
-  btn.textContent = '⏳ 분석 중…';
+  btn.textContent = '🤖 AI가 분석 중…';
   btn.classList.add('loading');
 
-  setTimeout(()=>{
-    showResult(cl, name);
+  // 서버에서 Gemini API 호출 → 분류 + 피드백 생성 + 시트 저장 한 번에 처리
+  google.script.run
+    .withSuccessHandler(r=>{
+      busy = false;
+      btn.disabled = false;
+      btn.textContent = '✨ 질문 제출하기';
+      btn.classList.remove('loading');
 
-    google.script.run
-      .withSuccessHandler(r=>{
-        busy = false;
-        btn.disabled = false;
-        btn.textContent = '✨ 질문 제출하기';
-        btn.classList.remove('loading');
-
-        if(r && r.success){
-          showToast('ok','✅ 질문이 저장되었습니다!');
-          document.getElementById('iq').value = '';
-          document.getElementById('qlen').textContent = '0';
-          loadData();
-        } else {
-          showToast('err','저장 실패: '+(r&&r.error||'알 수 없는 오류'));
-        }
-      })
-      .withFailureHandler(e=>{
-        busy = false;
-        btn.disabled = false;
-        btn.textContent = '✨ 질문 제출하기';
-        btn.classList.remove('loading');
-        showToast('err','오류: '+(e.message||e));
-      })
-      .saveQuestion({grade, classNum, number, name, question,
-        type:cl.cls, gradeName:cl.gradeName, emoji:cl.emoji,
-        internalScore:cl.internalScore, displayScore:cl.displayScore,
-        feedbackMsg:cl.fb, tipsMsg:cl.tips});
-  }, 700);
+      if(r && r.success){
+        showResult(r); // AI 결과로 화면 표시
+        showToast('ok','✅ 질문이 저장되었습니다!');
+        document.getElementById('iq').value = '';
+        document.getElementById('qlen').textContent = '0';
+        loadData();
+      } else {
+        showToast('err','오류: '+(r&&r.error||'알 수 없는 오류'));
+      }
+    })
+    .withFailureHandler(e=>{
+      busy = false;
+      btn.disabled = false;
+      btn.textContent = '✨ 질문 제출하기';
+      btn.classList.remove('loading');
+      showToast('err','오류: '+(e.message||e));
+    })
+    .submitQuestion({grade, classNum, number, name, question});
 }
 
-function showResult(cl, name){
+// r = { type, gradeName, emoji, displayScore, feedback, tips }
+function showResult(r){
+  const info = DISPLAY[r.type] || DISPLAY.factual;
+
   const card = document.getElementById('res-card');
   card.classList.add('show');
   card.scrollIntoView({behavior:'smooth',block:'start'});
 
   const gb = document.getElementById('g-box');
-  gb.className = 'grade-box ' + cl.cls;
+  gb.className = 'grade-box ' + info.cls;
 
-  document.getElementById('g-emoji').textContent = cl.emoji;
-  document.getElementById('g-name').textContent  = cl.gradeName + ' 등급';
-  document.getElementById('g-name').className    = 'g-name '+cl.cls;
-  document.getElementById('g-label').textContent = cl.name;
+  document.getElementById('g-emoji').textContent = r.emoji;
+  document.getElementById('g-name').textContent  = r.gradeName + ' 등급';
+  document.getElementById('g-name').className    = 'g-name ' + info.cls;
+  document.getElementById('g-label').textContent = info.typeName;
 
   // 별점
   const st = document.getElementById('stars');
   st.innerHTML = '';
   for(let i=0;i<5;i++){
     const s = document.createElement('span');
-    s.className = 'star'+(i<cl.starCount?' lit':'');
+    s.className = 'star'+(i<info.starCount?' lit':'');
     s.style.animationDelay = (i*.1)+'s';
-    s.textContent = i<cl.starCount ? '⭐' : '☆';
+    s.textContent = i<info.starCount ? '⭐' : '☆';
     st.appendChild(s);
   }
 
   // 프로그레스 바
   const pb = document.getElementById('prog');
-  pb.className = 'prog-bar '+cl.cls;
+  pb.className = 'prog-bar ' + info.cls;
   pb.style.width = '0%';
-  setTimeout(()=>{ pb.style.width = cl.prog+'%'; }, 120);
+  setTimeout(()=>{ pb.style.width = info.prog+'%'; }, 120);
 
-  document.getElementById('fb-msg').textContent   = name+' 학생, '+cl.fb;
-  document.getElementById('tips-box').className   = 'tips-box '+cl.cls;
-  document.getElementById('tips-msg').textContent = cl.tips;
+  document.getElementById('fb-msg').textContent   = r.feedback;
+  document.getElementById('tips-box').className   = 'tips-box ' + info.cls;
+  document.getElementById('tips-msg').textContent = r.tips;
 }
 
 // ────────────────────────────────────────────────────────────
