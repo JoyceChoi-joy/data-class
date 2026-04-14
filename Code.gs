@@ -99,8 +99,7 @@ function classifyWithGemini_(question, name) {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0,
-      maxOutputTokens: 600,
-      responseMimeType: 'application/json'
+      maxOutputTokens: 600
     }
   };
 
@@ -116,10 +115,14 @@ function classifyWithGemini_(question, name) {
 
   const rawText = resJson.candidates[0].content.parts[0].text;
 
-  // JSON 추출: 마크다운 코드블록 또는 앞뒤 텍스트가 있어도 처리
-  let cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  // JSON 추출: 마크다운 코드블록 및 앞뒤 텍스트 제거
+  let cleaned = rawText
+    .replace(/```json\s*/g, '')
+    .replace(/```\s*/g, '')
+    .trim();
   const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-  if (jsonMatch) cleaned = jsonMatch[0];
+  if (!jsonMatch) throw new Error('Gemini 응답에서 JSON을 찾을 수 없습니다: ' + rawText.slice(0, 100));
+  cleaned = jsonMatch[0];
 
   const result = JSON.parse(cleaned);
 
