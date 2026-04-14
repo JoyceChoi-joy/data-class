@@ -66,18 +66,27 @@ function classifyWithGemini_(question, name) {
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
 
   const prompt =
-    '학생 질문 분류 전문가입니다. 아래 학생의 질문을 분석하고 JSON으로만 응답하세요.\n\n' +
+    '당신은 학생의 질문 수준을 분석하는 교육 전문가입니다.\n\n' +
     '학생 이름: ' + name + '\n' +
     '학생 질문: "' + question + '"\n\n' +
-    '[분류 기준]\n' +
-    '- factual(병아리): "무엇?", "언제?", "어디?", "누가?" 등 단순 사실 확인 질문\n' +
-    '- conceptual(사춘기닭): "왜?", "어떻게?", "원인은?", "차이점은?" 등 원리와 관계를 탐구하는 질문\n' +
-    '- debatable(시조새): "옳은가?", "해야 하나?", "찬성/반대" 등 가치 판단과 토론이 필요한 질문\n\n' +
-    '[응답] 아래 JSON 형식만 출력 (다른 텍스트 절대 없이):\n' +
+
+    '[질문 수준 3단계]\n' +
+    '1. factual(병아리): 하나의 정답이 있는 사실 확인 질문. "무엇?", "언제?", "누가?", "어디?" 등\n' +
+    '2. conceptual(사춘기닭): 원리·이유·관계·과정을 탐구하는 질문. "왜?", "어떻게?", "차이는?", "원인은?" 등\n' +
+    '3. debatable(시조새): 정답이 없고 가치 판단·토론이 필요한 질문. "옳은가?", "해야 하는가?", "어떤 것이 더 나은가?" 등\n\n' +
+
+    '[분석 요청]\n' +
+    '① type: 위 세 수준 중 하나로 분류\n' +
+    '② feedback: 이 질문이 해당 수준으로 분류된 이유를, 질문의 구체적인 표현·구조·의도를 짚어서 설명 (2~3문장, ' + name + ' 학생에게 직접 말하는 친근한 톤)\n' +
+    '③ tips: 이 질문을 한 단계 더 높은 수준으로 바꾸는 방법 설명 (debatable이면 질문을 더 풍부하게 만드는 방법) (2문장)\n' +
+    '④ example: ③의 방법을 적용해서 이 질문을 직접 변형한 업그레이드 예시 질문 1개 (질문 형식으로, 짧고 구체적으로)\n\n' +
+
+    '[출력] 아래 JSON만 출력 (다른 텍스트 없이):\n' +
     '{\n' +
     '  "type": "factual" 또는 "conceptual" 또는 "debatable",\n' +
-    '  "feedback": "' + name + ' 학생의 질문 강점과 특징을 2~3문장으로 설명 (한국어, 따뜻하고 격려하는 톤)",\n' +
-    '  "tips": "이 질문을 한 단계 더 발전시키는 구체적인 방법 2~3문장 (한국어)"\n' +
+    '  "feedback": "이 질문이 해당 수준인 이유 설명",\n' +
+    '  "tips": "업그레이드 방법 설명",\n' +
+    '  "example": "변형된 예시 질문"\n' +
     '}';
 
   const payload = {
@@ -177,12 +186,13 @@ function submitQuestion(data) {
     // 4. 클라이언트에 결과 반환
     return {
       success:      true,
-      type:         aiResult.type || 'factual',
+      type:         aiResult.type    || 'factual',
       gradeName:    meta.gradeName,
       emoji:        meta.emoji,
       displayScore: meta.displayScore,
       feedback:     aiResult.feedback || '',
-      tips:         aiResult.tips     || ''
+      tips:         aiResult.tips     || '',
+      example:      aiResult.example  || ''
     };
   } catch (err) {
     return { success: false, error: err.toString() };

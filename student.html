@@ -149,6 +149,21 @@
     .tips-box.conceptual{background:#EFF6FF;border-left:4px solid var(--conceptual-c)}
     .tips-box.debatable{background:#F5F3FF;border-left:4px solid var(--debatable-c)}
 
+    /* ── 업그레이드 예시 질문 ── */
+    .example-box{
+      border-radius:var(--rs);padding:.9rem 1rem;margin-top:.7rem;
+      background:#F0FDF4;border:1.5px solid #86EFAC;display:none
+    }
+    .example-box.show{display:block;animation:slideIn .4s ease}
+    .example-lbl{
+      font-size:.72rem;font-weight:700;color:#16A34A;
+      text-transform:uppercase;letter-spacing:.4px;margin-bottom:.45rem
+    }
+    .example-q{
+      font-size:.93rem;line-height:1.7;color:#14532D;
+      font-style:italic;font-weight:500
+    }
+
     /* ── SECTION HEADER ── */
     .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem}
 
@@ -288,6 +303,10 @@
     </div>
     <div class="fb-box"><p id="fb-msg"></p></div>
     <div class="tips-box" id="tips-box"><p id="tips-msg"></p></div>
+    <div class="example-box" id="example-box">
+      <div class="example-lbl">💬 이렇게 질문해보면 어떨까요?</div>
+      <div class="example-q" id="example-q"></div>
+    </div>
   </div>
 
   <!-- ══ 실시간 피드 ══ -->
@@ -428,6 +447,16 @@ function showResult(r){
   document.getElementById('fb-msg').textContent   = r.feedback;
   document.getElementById('tips-box').className   = 'tips-box ' + info.cls;
   document.getElementById('tips-msg').textContent = r.tips;
+
+  // 업그레이드 예시 질문
+  const exBox = document.getElementById('example-box');
+  const exQ   = document.getElementById('example-q');
+  if(r.example){
+    exQ.textContent = '"' + r.example + '"';
+    exBox.classList.add('show');
+  } else {
+    exBox.classList.remove('show');
+  }
 }
 
 // ────────────────────────────────────────────────────────────
