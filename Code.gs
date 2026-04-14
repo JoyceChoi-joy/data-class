@@ -91,7 +91,11 @@ function classifyWithGemini_(question, name) {
 
   const payload = {
     contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.3, maxOutputTokens: 600 }
+    generationConfig: {
+      temperature: 0,           // 일관된 분류를 위해 0으로 고정
+      maxOutputTokens: 600,
+      responseMimeType: 'application/json' // 순수 JSON만 반환하도록 강제
+    }
   };
 
   const response = UrlFetchApp.fetch(url, {
@@ -105,8 +109,19 @@ function classifyWithGemini_(question, name) {
   if (resJson.error) throw new Error('Gemini 오류: ' + resJson.error.message);
 
   const rawText = resJson.candidates[0].content.parts[0].text;
-  const cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
+
+  // JSON 추출: 마크다운 코드블록 또는 앞뒤 텍스트가 있어도 처리
+  let cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (jsonMatch) cleaned = jsonMatch[0];
+
+  const result = JSON.parse(cleaned);
+
+  // type 값 검증: 허용 값 외에는 키워드로 재분류
+  if (!['factual','conceptual','debatable'].includes(result.type)) {
+    result.type = classifyByKeyword_(rawText).type;
+  }
+  return result;
 }
 
 // ----------------------------------------------------------
@@ -114,22 +129,67 @@ function classifyWithGemini_(question, name) {
 // ----------------------------------------------------------
 function classifyByKeyword_(question) {
   const t = question;
-  const DKW = ['해야 하','찬성','반대','옳은가','옳은지','윤리','도덕','바람직','어떻게 생각','어느 쪽이','정당한가','허용'];
-  const CKW = ['왜 ','왜?','왜요','어떻게 되','이유는','원리는','차이는','차이점','관계는','영향을','어떻게 작동','원인은'];
+
+  // 논쟁적 키워드 — 어근 단위로 광범위하게 설정
+  // '옳은가', '옳은 선택인가', '옳은지' 모두 '옳은'으로 잡음
+  const DKW = [
+    '해야 하', '해야 할', '해야 되', '이어야 하', '해야만',
+    '찬성', '반대',
+    '옳은', '그른', '잘못된',
+    '윤리', '도덕', '가치 판단', '가치 있',
+    '바람직', '적절한', '정당한', '합리적인', '불합리',
+    '공정한', '불공정', '허용', '금지해야',
+    '어떻게 생각', '어떤 입장', '어느 쪽',
+    '더 나은가', '더 좋은가', '더 나쁜가',
+    '해도 되는', '해도 될까', '해도 되나',
+    '필요한가', '필요할까', '필요한지',
+    '선택인가', '선택해야', '결정인가',
+    '지속해야', '유지해야', '폐지해야', '도입해야',
+    '동의', '반론', '논쟁', '논란'
+  ];
+
+  // 개념적 키워드
+  const CKW = [
+    '왜 ', '왜?', '왜요', '어째서', '무슨 이유',
+    '어떻게 되', '어떻게 작동', '어떻게 이루', '어떻게 만',
+    '이유는', '이유가', '원인은', '원인이',
+    '원리는', '원리가', '메커니즘', '작동 방식',
+    '차이는', '차이가', '차이점', '다른 점',
+    '관계는', '관계가', '어떤 관계',
+    '영향을', '영향은', '의미는', '의미가',
+    '역할은', '역할이', '구조는', '과정은',
+    '비교하면', '공통점', '유사점'
+  ];
+
   let d = 0, c = 0;
   DKW.forEach(function(k){ if(t.includes(k)) d++; });
   CKW.forEach(function(k){ if(t.includes(k)) c++; });
 
+  // 가치 판단 형용사 단독으로도 강하게 debatable 점수 부여
+  // "옳은 선택인가", "정당한 행동인가" 등 포함
+  ['옳','그른','바람직','적절','정당','공정','불공정','윤리','도덕','합리'].forEach(function(adj){
+    if(t.includes(adj)) d += 2;
+  });
+
   const type = (d > 0 && d >= c) ? 'debatable' : (c > 0 ? 'conceptual' : 'factual');
   const MSG = {
-    factual:   { feedback:'사실을 확인하는 기초 질문입니다. 모든 깊은 탐구는 이렇게 시작돼요!',
-                 tips:'"왜?" 또는 "어떻게?"를 붙여보세요. 사실 뒤에 숨은 원리를 탐구하면 한 단계 높은 질문이 됩니다.' },
-    conceptual:{ feedback:'원리와 관계를 탐구하는 깊이 있는 질문입니다. 비판적 사고가 돋보여요!',
-                 tips:'"이것이 옳은가?", "어느 것이 더 나은가?"처럼 가치 판단을 더하면 논쟁적 질문으로 발전해요.' },
-    debatable: { feedback:'정답이 없는 최고 수준의 논쟁적 질문입니다! 다양한 관점에서 토론이 가능해요.',
-                 tips:'찬성·반대 근거를 각각 정리하고 경제·윤리·사회적 관점으로 나눠 분석해보세요.' }
+    factual:   {
+      feedback: '사실을 확인하는 기초 질문입니다. 모든 깊은 탐구는 이렇게 시작돼요!',
+      tips: '"왜?" 또는 "어떻게?"를 붙여보세요. 사실 뒤에 숨은 원리를 탐구하면 한 단계 높은 질문이 됩니다.',
+      example: ''
+    },
+    conceptual: {
+      feedback: '원리와 관계를 탐구하는 깊이 있는 질문입니다. 비판적 사고가 돋보여요!',
+      tips: '"이것이 옳은가?", "어느 것이 더 나은가?"처럼 가치 판단을 더하면 논쟁적 질문으로 발전해요.',
+      example: ''
+    },
+    debatable: {
+      feedback: '정답이 없는 최고 수준의 논쟁적 질문입니다! 다양한 관점에서 토론이 가능해요.',
+      tips: '찬성·반대 근거를 각각 정리하고 경제·윤리·사회적 관점으로 나눠 분석해보세요.',
+      example: ''
+    }
   };
-  return { type: type, feedback: MSG[type].feedback, tips: MSG[type].tips };
+  return { type: type, feedback: MSG[type].feedback, tips: MSG[type].tips, example: '' };
 }
 
 // ----------------------------------------------------------
