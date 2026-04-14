@@ -152,13 +152,25 @@ function classifyByKeyword_(question) {
   const CKW = [
     '왜 ', '왜?', '왜요', '어째서', '무슨 이유',
     '어떻게 되', '어떻게 작동', '어떻게 이루', '어떻게 만',
+    '어떻게 해서', '어떻게 생각',
     '이유는', '이유가', '원인은', '원인이',
     '원리는', '원리가', '메커니즘', '작동 방식',
     '차이는', '차이가', '차이점', '다른 점',
     '관계는', '관계가', '어떤 관계',
     '영향을', '영향은', '의미는', '의미가',
     '역할은', '역할이', '구조는', '과정은',
-    '비교하면', '공통점', '유사점'
+    '비교하면', '공통점', '유사점',
+    // 인과·과정·변화를 묻는 표현
+    '어쩌다', '어떤 계기', '어떤 과정', '어떤 이유',
+    '무슨 일이', '무슨 계기', '무슨 이유',
+    '왜 그런', '왜 그렇게', '왜 그게', '왜 이런', '왜 이렇게',
+    '어떤 일이', '어떤 사건',
+    '어떻게 변', '어떻게 극복', '어떻게 해결', '어떻게 성장',
+    '어떻게 알게', '어떻게 느끼', '어떻게 달라',
+    '되었을까', '됐을까', '되었나', '됐나',
+    '잃게 된', '찾게 된', '갖게 된', '알게 된',
+    '변하게 된', '바뀌게 된', '겪게 된',
+    '겪었을까', '느꼈을까', '생각했을까', '선택했을까'
   ];
 
   let d = 0, c = 0;
@@ -200,13 +212,13 @@ function submitQuestion(data) {
     const name     = String(data.name     || '');
     const question = String(data.question || '');
 
-    // 1. Gemini API로 분류 (실패 시 키워드 폴백)
+    // 1. Gemini API로 분류 (실패 시 에러 반환 — 키워드 폴백 사용 안 함)
     let aiResult;
     try {
       aiResult = classifyWithGemini_(question, name);
     } catch (aiErr) {
-      Logger.log('Gemini 실패, 키워드 폴백: ' + aiErr);
-      aiResult = classifyByKeyword_(question);
+      Logger.log('Gemini API 실패: ' + aiErr);
+      return { success: false, error: 'AI 분류에 실패했습니다. 잠시 후 다시 시도해 주세요.\n(상세: ' + aiErr.message + ')' };
     }
 
     // 2. 유형별 메타데이터
